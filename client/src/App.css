@@ -1,0 +1,785 @@
+/* =====================================================
+   GLOBAL
+===================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f7fb;
+  color: #172033;
+}
+
+
+/* =====================================================
+   MAIN APP
+===================================================== */
+
+.app-container {
+  min-height: 100vh;
+  background: #f4f7fb;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header {
+  background: #111827;
+  color: white;
+  text-align: center;
+  padding: 35px 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.header p {
+  margin: 10px 0 0;
+  font-size: 18px;
+  color: #d1d5db;
+}
+
+
+/* =====================================================
+   MAIN CONTENT
+===================================================== */
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 55px 30px;
+  text-align: center;
+}
+
+.main-content > h2 {
+  margin: 0;
+  font-size: 32px;
+  color: #111827;
+}
+
+.intro-text {
+  margin: 12px 0 40px;
+  font-size: 18px;
+  color: #5b6475;
+}
+
+
+/* =====================================================
+   SECURITY CARDS
+===================================================== */
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.security-card {
+  background: white;
+  border-radius: 16px;
+  padding: 30px 25px;
+  min-height: 300px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.08);
+
+  border: 1px solid #e5e7eb;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.security-card:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+
+/* =====================================================
+   CARD ICON
+===================================================== */
+
+.card-icon {
+  font-size: 45px;
+  margin-bottom: 15px;
+}
+
+.security-card h3 {
+  margin: 5px 0 15px;
+  font-size: 22px;
+  color: #374151;
+}
+
+.security-card p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #64748b;
+  margin: 0 0 25px;
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.check-button,
+.backend-button,
+.close-button {
+  border: none;
+  border-radius: 9px;
+
+  padding: 13px 24px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.check-button:hover,
+.backend-button:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.check-button:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* =====================================================
+   URL CHECKER PANEL
+===================================================== */
+
+.url-checker-panel {
+  margin: 45px auto 0;
+
+  max-width: 1000px;
+
+  background: white;
+
+  border-radius: 18px;
+
+  padding: 35px;
+
+  box-shadow:
+    0 10px 35px rgba(15, 23, 42, 0.10);
+
+  border: 1px solid #e5e7eb;
+}
+
+.url-checker-panel h2 {
+  margin-top: 0;
+
+  font-size: 28px;
+
+  color: #111827;
+}
+
+.url-checker-panel > p {
+  font-size: 17px;
+
+  color: #64748b;
+
+  margin-bottom: 25px;
+}
+
+
+/* =====================================================
+   URL INPUT
+===================================================== */
+
+.url-input-container {
+  display: flex;
+
+  gap: 12px;
+
+  justify-content: center;
+
+  align-items: center;
+
+  margin: 25px auto;
+}
+
+.url-input-container input {
+  flex: 1;
+
+  max-width: 650px;
+
+  padding: 14px 16px;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 9px;
+
+  font-size: 16px;
+
+  outline: none;
+}
+
+.url-input-container input:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* =====================================================
+   CLOSE BUTTON
+===================================================== */
+
+.close-button {
+  background: #64748b;
+
+  margin-bottom: 25px;
+}
+
+.close-button:hover {
+  background: #475569;
+
+  transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   RESULT BOX
+===================================================== */
+
+.result-box {
+  text-align: left;
+
+  margin-top: 25px;
+
+  padding: 30px;
+
+  background: #f8fafc;
+
+  border-radius: 14px;
+
+  border: 1px solid #e2e8f0;
+}
+
+.result-box h2 {
+  text-align: center;
+
+  margin-top: 0;
+
+  margin-bottom: 25px;
+
+  color: #334155;
+}
+
+.result-box p {
+  font-size: 17px;
+
+  line-height: 1.6;
+
+  color: #475569;
+}
+
+.result-box strong {
+  color: #334155;
+}
+
+
+/* =====================================================
+   RISK LEVEL
+===================================================== */
+
+.risk-low {
+  color: #15803d;
+
+  font-weight: 700;
+}
+
+.risk-medium {
+  color: #d97706;
+
+  font-weight: 700;
+}
+
+.risk-high {
+  color: #dc2626;
+
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   ANALYSIS SECTIONS
+===================================================== */
+
+.analysis-section {
+  margin-top: 25px;
+}
+
+.analysis-section h3 {
+  color: #334155;
+
+  margin-bottom: 12px;
+}
+
+.analysis-section ul {
+  padding-left: 25px;
+}
+
+.analysis-section li {
+  margin-bottom: 9px;
+
+  color: #475569;
+
+  line-height: 1.5;
+}
+
+
+/* =====================================================
+   ASSESSMENT
+===================================================== */
+
+.assessment {
+  margin-top: 30px;
+
+  padding: 18px;
+
+  background: #eef6ff;
+
+  border-left: 5px solid #2563eb;
+
+  border-radius: 6px;
+}
+
+
+/* =====================================================
+   VIRUSTOTAL
+===================================================== */
+
+.threat-intel {
+  margin-top: 30px;
+
+  padding: 25px;
+
+  background: #ffffff;
+
+  border: 1px solid #dbeafe;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 15px rgba(15, 23, 42, 0.05);
+}
+
+.threat-intel h2 {
+  text-align: left;
+
+  font-size: 22px;
+
+  margin-top: 0;
+
+  margin-bottom: 20px;
+
+  color: #1e3a8a;
+}
+
+.threat-intel p {
+  margin: 10px 0;
+}
+
+.vt-message {
+  background: #f8fafc;
+
+  padding: 15px;
+
+  border-radius: 8px;
+}
+
+.vt-result {
+  margin-top: 20px !important;
+
+  padding: 15px;
+
+  background: #eff6ff;
+
+  border-radius: 8px;
+}
+
+
+/* =====================================================
+   VIRUSTOTAL STATUS
+===================================================== */
+
+.vt-safe {
+  color: #15803d;
+
+  font-weight: 600;
+}
+
+.vt-warning {
+  color: #d97706;
+
+  font-weight: 600;
+}
+
+.vt-danger {
+  color: #dc2626;
+
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+.error-box {
+  border-left: 5px solid #dc2626;
+
+  background: #fef2f2;
+}
+
+.error-box h2 {
+  color: #b91c1c;
+}
+
+
+/* =====================================================
+   DISCLAIMER
+===================================================== */
+
+.disclaimer {
+  margin-top: 25px;
+
+  font-size: 13px !important;
+
+  color: #64748b !important;
+
+  font-style: italic;
+}
+
+
+/* =====================================================
+   BACKEND TEST
+===================================================== */
+
+.backend-test {
+  margin-top: 50px;
+
+  padding: 25px;
+}
+
+.backend-test p {
+  margin-top: 15px;
+
+  color: #15803d;
+
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   FILE CHECKER
+===================================================== */
+
+.file-input-container {
+  margin: 25px auto;
+
+  padding: 25px;
+
+  border: 2px dashed #cbd5e1;
+
+  border-radius: 12px;
+
+  background: #f8fafc;
+
+  max-width: 650px;
+}
+
+.file-input-container input {
+  width: 100%;
+
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+.selected-file {
+  margin: 20px auto;
+
+  padding: 12px;
+
+  background: #eff6ff;
+
+  border-radius: 8px;
+
+  max-width: 650px;
+}
+
+.file-buttons {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin: 20px 0;
+}
+
+.hash {
+  word-break: break-all;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 13px !important;
+
+  background: #f1f5f9;
+
+  padding: 12px;
+
+  border-radius: 8px;
+}
+
+
+/* =====================================================
+   FILE INFORMATION
+===================================================== */
+
+.file-info {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 15px;
+
+  margin: 20px 0;
+}
+
+.file-info-item {
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 10px;
+
+  padding: 15px;
+}
+
+.file-info-item strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #334155;
+}
+
+
+/* =====================================================
+   DIGITAL FOOTPRINT
+===================================================== */
+
+.footprint-panel {
+  text-align: left;
+}
+
+.footprint-panel > h2,
+.footprint-panel > p {
+  text-align: center;
+}
+
+.footprint-field {
+  max-width: 700px;
+
+  margin: 18px auto;
+}
+
+.footprint-field label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  font-weight: 700;
+
+  color: #334155;
+
+  font-size: 15px;
+}
+
+.footprint-field input {
+  width: 100%;
+
+  padding: 14px 16px;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 9px;
+
+  font-size: 16px;
+
+  outline: none;
+
+  background: white;
+}
+
+.footprint-field input:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.privacy-note {
+  max-width: 700px;
+
+  margin: 25px auto;
+
+  padding: 16px;
+
+  background: #eff6ff;
+
+  border-left: 4px solid #2563eb;
+
+  border-radius: 7px;
+
+  color: #475569;
+
+  line-height: 1.6;
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.loading-box {
+  text-align: center;
+
+  padding: 25px;
+
+  color: #475569;
+}
+
+.loading-box p {
+  margin-bottom: 0;
+}
+
+
+/* =====================================================
+   RESPONSIVE DESIGN
+===================================================== */
+
+@media (max-width: 900px) {
+
+  .cards-container {
+    grid-template-columns: 1fr;
+  }
+
+  .security-card {
+    max-width: 550px;
+
+    width: 100%;
+
+    margin: 0 auto;
+  }
+
+  .file-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 650px) {
+
+  .header {
+    padding: 30px 15px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+  }
+
+  .header p {
+    font-size: 16px;
+  }
+
+  .main-content {
+    padding: 35px 15px;
+  }
+
+  .main-content > h2 {
+    font-size: 27px;
+  }
+
+  .intro-text {
+    font-size: 16px;
+  }
+
+  .url-checker-panel {
+    padding: 20px;
+  }
+
+  .url-input-container {
+    flex-direction: column;
+  }
+
+  .url-input-container input {
+    width: 100%;
+
+    max-width: none;
+  }
+
+  .url-input-container button {
+    width: 100%;
+  }
+
+  .file-buttons {
+    flex-direction: column;
+  }
+
+  .file-buttons button {
+    width: 100%;
+  }
+
+  .threat-intel {
+    padding: 18px;
+  }
+
+  .result-box {
+    padding: 20px;
+  }
+
+  .result-box p {
+    font-size: 16px;
+  }
+
+  .security-card {
+    min-height: auto;
+  }
+}
