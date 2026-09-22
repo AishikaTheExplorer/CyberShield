@@ -93,7 +93,7 @@ function App() {
 
       const response =
         await axios.post(
-          "http://localhost:5000/api/url-check",
+          "https://cybershield-zdsb.onrender.com/api/url-check",
           {
             url: url.trim()
           }
@@ -218,7 +218,7 @@ function App() {
 
       const response =
         await axios.post(
-          "http://localhost:5000/api/file-check",
+          "https://cybershield-zdsb.onrender.com/api/file-check",
           formData,
           {
             headers: {
@@ -336,7 +336,7 @@ function App() {
 
       const response =
         await axios.post(
-          "http://localhost:5000/api/digital-footprint",
+          "https://cybershield-zdsb.onrender.com/api/digital-footprint",
           footprintData
         );
 
@@ -389,7 +389,7 @@ function App() {
 
       const response =
         await axios.get(
-          "http://localhost:5000/"
+         "https://cybershield-zdsb.onrender.com/"
         );
 
 
