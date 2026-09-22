@@ -1,3 +1,8 @@
+/* =====================================================
+   CYBERSHIELD BACKEND
+   Node.js + Express
+===================================================== */
+
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -6,537 +11,1023 @@ const multer = require("multer");
 const crypto = require("crypto");
 const path = require("path");
 
+const analyzeURL =
+  require("./services/url/urlAnalyzer");
+
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+/* =====================================================
+   CONFIGURATION
+===================================================== */
 
-const PORT = process.env.PORT || 5000;
+const PORT =
+  process.env.PORT || 5000;
+
+const FRONTEND_URL =
+  process.env.FRONTEND_URL ||
+  "https://cyber-shield-woad.vercel.app";
+
+
+/* =====================================================
+   CORS
+===================================================== */
+
+const allowedOrigins = [
+
+  "http://localhost:5173",
+
+  "http://localhost:3000",
+
+  "https://cyber-shield-woad.vercel.app",
+
+  "https://cyber-shield-lpcgrv546-aishikatheexplorer.vercel.app",
+
+  FRONTEND_URL
+
+].filter(Boolean);
+
+
+app.use(
+  cors({
+
+    origin: function (origin, callback) {
+
+      /*
+       * Allow requests without an Origin.
+       * Useful for Postman, curl, etc.
+       */
+
+      if (!origin) {
+        return callback(null, true);
+      }
+
+
+      if (
+        allowedOrigins.includes(origin)
+      ) {
+
+        return callback(null, true);
+
+      }
+
+
+      console.log(
+        "CORS blocked:",
+        origin
+      );
+
+
+      return callback(
+        new Error(
+          "Not allowed by CORS"
+        )
+      );
+    },
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization"
+    ]
+  })
+);
+
+
+/* =====================================================
+   BODY PARSER
+===================================================== */
+
+app.use(
+  express.json({
+    limit: "2mb"
+  })
+);
+
+
+app.use(
+  express.urlencoded({
+    extended: true
+  })
+);
 
 
 /* =====================================================
    FILE UPLOAD
 ===================================================== */
 
-const upload = multer({
-  storage: multer.memoryStorage(),
+const upload =
+  multer({
 
-  limits: {
-    fileSize: 50 * 1024 * 1024
-  }
-});
+    storage:
+      multer.memoryStorage(),
 
+    limits: {
 
-/* =====================================================
-   HOME
-===================================================== */
+      fileSize:
+        50 * 1024 * 1024
 
-app.get("/", (req, res) => {
-  res.json({
-    message: "CyberShield Backend is running!"
+    }
+
   });
-});
 
 
 /* =====================================================
-   URL ANALYSIS
+   HOME / SERVER TEST
 ===================================================== */
 
-function performBasicURLAnalysis(url) {
+app.get(
+  "/",
+  (req, res) => {
 
-  let riskScore = 0;
+    res.status(200).json({
 
-  const warnings = [];
-  const positiveChecks = [];
+      status: "success",
 
-  let parsedURL;
+      message:
+        "CyberShield Backend is running!",
 
-  try {
-    parsedURL = new URL(url.trim());
-  } catch (error) {
-    return {
-      riskScore: 100,
-      riskLevel: "HIGH",
-      warnings: ["Invalid URL format"],
-      positiveChecks: []
-    };
+      service:
+        "CyberShield API",
+
+      timestamp:
+        new Date().toISOString()
+
+    });
+
   }
+);
 
 
-  /* HTTPS */
+/* =====================================================
+   HEALTH CHECK
+===================================================== */
 
-  if (parsedURL.protocol === "https:") {
+app.get(
+  "/api/health",
+  (req, res) => {
 
-    positiveChecks.push(
-      "HTTPS connection detected"
-    );
+    res.status(200).json({
 
-  } else {
+      status: "success",
 
-    riskScore += 20;
+      message:
+        "CyberShield backend is connected",
 
-    warnings.push(
-      "Website is not using HTTPS"
-    );
+      environment:
+        process.env.NODE_ENV ||
+        "production",
+
+      database:
+        mongoose.connection.readyState === 1
+          ? "connected"
+          : "not connected",
+
+      timestamp:
+        new Date().toISOString()
+
+    });
+
   }
-
-
-  /* IP ADDRESS */
-
-  const ipPattern =
-    /^(?:\d{1,3}\.){3}\d{1,3}$/;
-
-  if (ipPattern.test(parsedURL.hostname)) {
-
-    riskScore += 25;
-
-    warnings.push(
-      "URL uses an IP address instead of a normal domain name"
-    );
-
-  } else {
-
-    positiveChecks.push(
-      "Normal domain structure detected"
-    );
-  }
-
-
-  /* URL LENGTH */
-
-  if (url.length > 150) {
-
-    riskScore += 15;
-
-    warnings.push(
-      "URL is unusually long"
-    );
-  }
-
-
-  /* @ SYMBOL */
-
-  if (url.includes("@")) {
-
-    riskScore += 20;
-
-    warnings.push(
-      "URL contains an @ symbol"
-    );
-  }
-
-
-  /* SUSPICIOUS KEYWORDS */
-
-  const suspiciousKeywords = [
-    "login",
-    "verify",
-    "verification",
-    "password",
-    "account",
-    "secure",
-    "update",
-    "bank",
-    "payment",
-    "signin"
-  ];
-
-  const foundKeywords =
-    suspiciousKeywords.filter((keyword) =>
-      url.toLowerCase().includes(keyword)
-    );
-
-  if (foundKeywords.length >= 2) {
-
-    riskScore += 20;
-
-    warnings.push(
-      `URL contains suspicious keywords: ${foundKeywords.join(", ")}`
-    );
-  }
-
-
-  /* MANY SUBDOMAINS */
-
-  const hostnameParts =
-    parsedURL.hostname.split(".");
-
-  if (hostnameParts.length > 4) {
-
-    riskScore += 15;
-
-    warnings.push(
-      "Domain contains an unusually large number of subdomains"
-    );
-  }
-
-
-  riskScore =
-    Math.min(riskScore, 100);
-
-
-  let riskLevel = "LOW";
-
-  if (riskScore > 60) {
-
-    riskLevel = "HIGH";
-
-  } else if (riskScore > 30) {
-
-    riskLevel = "MEDIUM";
-  }
-
-
-  return {
-    riskScore,
-    riskLevel,
-    warnings,
-    positiveChecks
-  };
-}
+);
 
 
 /* =====================================================
    URL SAFETY CHECKER
 ===================================================== */
 
-app.post("/api/url-check", async (req, res) => {
-
-  try {
-
-    const { url } = req.body;
-
-    if (!url || !url.trim()) {
-
-      return res.status(400).json({
-        status: "error",
-        message: "Please enter a URL."
-      });
-    }
-
-
-    let parsedURL;
+app.post(
+  "/api/url-check",
+  async (req, res) => {
 
     try {
 
-      parsedURL =
-        new URL(url.trim());
-
-    } catch (error) {
-
-      return res.status(400).json({
-        status: "error",
-        message: "Please enter a valid URL."
-      });
-    }
+      const { url } =
+        req.body;
 
 
-    const basicAnalysis =
-      performBasicURLAnalysis(
-        parsedURL.href
-      );
+      /* ---------------------------------------------
+         1. Validate URL input
+      --------------------------------------------- */
+
+      if (
+        !url ||
+        typeof url !== "string" ||
+        !url.trim()
+      ) {
+
+        return res.status(400).json({
+
+          status: "error",
+
+          message:
+            "Please enter a URL."
+
+        });
+
+      }
 
 
-    /* =================================================
-       VIRUSTOTAL URL
-    ================================================= */
-
-    const apiKey =
-      process.env.VIRUSTOTAL_API_KEY;
-
-    let threatIntel = {
-
-      available: false,
-
-      reportFound: false,
-
-      message:
-        "VirusTotal API key is not configured."
-
-    };
+      const cleanURL =
+        url.trim();
 
 
-    if (apiKey) {
+      /* ---------------------------------------------
+         2. Run CyberShield URL analysis
+      --------------------------------------------- */
 
-      try {
-
-        const urlId =
-          Buffer.from(parsedURL.href)
-            .toString("base64")
-            .replace(/\+/g, "-")
-            .replace(/\//g, "_")
-            .replace(/=+$/, "");
+      const result =
+        await analyzeURL(
+          cleanURL
+        );
 
 
-        const virusTotalResponse =
-          await fetch(
-            `https://www.virustotal.com/api/v3/urls/${urlId}`,
-            {
-              method: "GET",
+      /*
+       * If the URL analyzer could not process
+       * the URL.
+       */
 
-              headers: {
-                "x-apikey": apiKey
+      if (
+        !result ||
+        result.success === false
+      ) {
+
+        return res.status(400).json({
+
+          status: "error",
+
+          message:
+            result?.message ||
+            "Unable to analyze the URL."
+
+        });
+
+      }
+
+
+      /* ---------------------------------------------
+         3. Get analysis information
+      --------------------------------------------- */
+
+      const analysis =
+        result.analysis || {};
+
+      const domain =
+        result.domain || {};
+
+      const redirects =
+        result.redirects || {};
+
+      const findings =
+        Array.isArray(
+          result.findings
+        )
+          ? result.findings
+          : [];
+
+
+      /* ---------------------------------------------
+         4. Determine information quality
+      --------------------------------------------- */
+
+      let informationScore = 0;
+
+
+      /*
+       * RDAP / domain information
+       */
+
+      if (
+        domain.rdapAvailable === true
+      ) {
+
+        informationScore += 2;
+
+      }
+
+
+      /*
+       * Domain age
+       */
+
+      if (
+        domain.ageDays !== null &&
+        domain.ageDays !== undefined
+      ) {
+
+        informationScore += 2;
+
+      }
+
+
+      /*
+       * Redirect analysis
+       */
+
+      if (
+        redirects.success === true
+      ) {
+
+        informationScore += 2;
+
+      }
+
+
+      /*
+       * Security findings
+       */
+
+      if (
+        findings.length > 0
+      ) {
+
+        informationScore += 2;
+
+      }
+
+
+      /*
+       * Positive checks
+       */
+
+      if (
+        Array.isArray(
+          result.positiveChecks
+        ) &&
+        result.positiveChecks.length > 0
+      ) {
+
+        informationScore += 1;
+
+      }
+
+
+      /*
+       * Hostname
+       */
+
+      if (
+        analysis.hostname
+      ) {
+
+        informationScore += 1;
+
+      }
+
+
+      /*
+       * Maximum approximately 10.
+       *
+       * 6+  = enough information
+       * <6  = limited information
+       */
+
+      const enoughInformation =
+        informationScore >= 6;
+
+
+      /* ---------------------------------------------
+         5. Decide whether VirusTotal is needed
+      --------------------------------------------- */
+
+      let needsVirusTotal =
+        !enoughInformation;
+
+
+      /*
+       * Strong risk indicators.
+       *
+       * VirusTotal is only considered when
+       * CyberShield also doesn't have enough
+       * information.
+       */
+
+      const highRiskIndicators =
+        findings.filter(
+          (finding) => {
+
+            return (
+              Number(
+                finding.points || 0
+              ) >= 25
+            );
+
+          }
+        );
+
+
+      if (
+        highRiskIndicators.length > 0 &&
+        !enoughInformation
+      ) {
+
+        needsVirusTotal = true;
+
+      }
+
+
+      /* ---------------------------------------------
+         6. Default threat intelligence
+      --------------------------------------------- */
+
+      let threatIntel = {
+
+        used: false,
+
+        available: false,
+
+        reportFound: false,
+
+        reason:
+          enoughInformation
+
+            ? "CyberShield had enough information to complete the initial assessment."
+
+            : "CyberShield did not have enough information for a confident assessment."
+
+      };
+
+
+      /* ---------------------------------------------
+         7. VirusTotal API
+      --------------------------------------------- */
+
+      const apiKey =
+        process.env.VIRUSTOTAL_API_KEY;
+
+
+      /*
+       * IMPORTANT:
+       *
+       * VirusTotal is NOT called for every URL.
+       *
+       * It is only called when:
+       *
+       *     needsVirusTotal === true
+       *
+       * AND
+       *
+       *     API key exists
+       */
+
+      if (
+        needsVirusTotal &&
+        apiKey
+      ) {
+
+        try {
+
+          let parsedURL;
+
+
+          try {
+
+            parsedURL =
+              new URL(
+                result.url
+              );
+
+          } catch {
+
+            parsedURL =
+              null;
+
+          }
+
+
+          if (parsedURL) {
+
+            /* -------------------------------------
+               Create VirusTotal URL ID
+            ------------------------------------- */
+
+            const urlId =
+              Buffer
+                .from(
+                  parsedURL.href
+                )
+                .toString("base64")
+                .replace(
+                  /\+/g,
+                  "-"
+                )
+                .replace(
+                  /\//g,
+                  "_"
+                )
+                .replace(
+                  /=+$/,
+                  ""
+                );
+
+
+            /* -------------------------------------
+               Ask VirusTotal for existing report
+            ------------------------------------- */
+
+            const virusTotalResponse =
+              await fetch(
+
+                `https://www.virustotal.com/api/v3/urls/${urlId}`,
+
+                {
+
+                  method: "GET",
+
+                  headers: {
+
+                    "x-apikey":
+                      apiKey,
+
+                    "Accept":
+                      "application/json"
+
+                  }
+
+                }
+
+              );
+
+
+            /* =====================================
+               VIRUSTOTAL REPORT FOUND
+            ===================================== */
+
+            if (
+              virusTotalResponse.ok
+            ) {
+
+              const virusTotalData =
+                await virusTotalResponse.json();
+
+
+              const attributes =
+                virusTotalData
+                  .data
+                  ?.attributes ||
+                {};
+
+
+              const stats =
+                attributes
+                  .last_analysis_stats ||
+                {};
+
+
+              const malicious =
+                stats.malicious || 0;
+
+              const suspicious =
+                stats.suspicious || 0;
+
+              const harmless =
+                stats.harmless || 0;
+
+              const undetected =
+                stats.undetected || 0;
+
+
+              /* -----------------------------------
+                 Start with CyberShield score
+              ----------------------------------- */
+
+              let finalRiskScore =
+                Number(
+                  result.score || 0
+                );
+
+
+              /*
+               * VirusTotal is additional evidence.
+               */
+
+              if (
+                malicious > 0
+              ) {
+
+                finalRiskScore =
+                  Math.max(
+                    finalRiskScore,
+                    80
+                  );
+
               }
+
+              else if (
+                suspicious > 0
+              ) {
+
+                finalRiskScore =
+                  Math.max(
+                    finalRiskScore,
+                    60
+                  );
+
+              }
+
+
+              finalRiskScore =
+                Math.min(
+                  finalRiskScore,
+                  100
+                );
+
+
+              /* -----------------------------------
+                 Final risk level
+              ----------------------------------- */
+
+              let finalRiskLevel =
+                "LOW";
+
+
+              if (
+                finalRiskScore >= 60
+              ) {
+
+                finalRiskLevel =
+                  "HIGH";
+
+              }
+
+              else if (
+                finalRiskScore >= 30
+              ) {
+
+                finalRiskLevel =
+                  "MEDIUM";
+
+              }
+
+
+              /* -----------------------------------
+                 Threat intelligence
+              ----------------------------------- */
+
+              threatIntel = {
+
+                used: true,
+
+                available: true,
+
+                reportFound: true,
+
+                source:
+                  "VirusTotal",
+
+                malicious,
+
+                suspicious,
+
+                harmless,
+
+                undetected,
+
+                message:
+
+                  malicious > 0
+
+                    ? "VirusTotal reported malicious detections."
+
+                    : suspicious > 0
+
+                    ? "VirusTotal reported suspicious detections."
+
+                    : "No malicious or suspicious detections were reported in the available VirusTotal analysis."
+
+              };
+
+
+              /* -----------------------------------
+                 Return combined result
+              ----------------------------------- */
+
+              return res.json({
+
+                status:
+                  "success",
+
+                url:
+                  result.url,
+
+                riskScore:
+                  finalRiskScore,
+
+                riskLevel:
+                  finalRiskLevel,
+
+                warnings:
+                  result.warnings || [],
+
+                positiveChecks:
+                  result.positiveChecks || [],
+
+                findings:
+                  result.findings || [],
+
+                analysis:
+                  result.analysis || {},
+
+                domain:
+                  result.domain || {},
+
+                typosquatting:
+                  result.typosquatting || {},
+
+                redirects:
+                  result.redirects || {},
+
+                informationQuality: {
+
+                  score:
+                    informationScore,
+
+                  enoughInformation:
+                    enoughInformation,
+
+                  virusTotalUsed:
+                    true
+
+                },
+
+                threatIntel,
+
+                message:
+
+                  finalRiskLevel ===
+                  "HIGH"
+
+                    ? "The URL has significant risk indicators."
+
+                    : finalRiskLevel ===
+                      "MEDIUM"
+
+                    ? "The URL has some suspicious indicators."
+
+                    : "No major suspicious indicators were detected."
+
+              });
+
             }
+
+
+            /* =====================================
+               VIRUSTOTAL HTTP STATUS
+            ===================================== */
+
+
+            if (
+              virusTotalResponse.status ===
+              404
+            ) {
+
+              threatIntel = {
+
+                used: true,
+
+                available: true,
+
+                reportFound: false,
+
+                source:
+                  "VirusTotal",
+
+                message:
+                  "No existing VirusTotal report was found for this URL."
+
+              };
+
+            }
+
+
+            else if (
+              virusTotalResponse.status ===
+              429
+            ) {
+
+              threatIntel = {
+
+                used: true,
+
+                available: false,
+
+                reportFound: false,
+
+                source:
+                  "VirusTotal",
+
+                message:
+                  "VirusTotal rate limit was reached. CyberShield's own analysis was still completed."
+
+              };
+
+            }
+
+
+            else if (
+              virusTotalResponse.status ===
+                401 ||
+              virusTotalResponse.status ===
+                403
+            ) {
+
+              threatIntel = {
+
+                used: true,
+
+                available: false,
+
+                reportFound: false,
+
+                source:
+                  "VirusTotal",
+
+                message:
+                  "VirusTotal authentication failed. Check your API key."
+
+              };
+
+            }
+
+
+            else {
+
+              threatIntel = {
+
+                used: true,
+
+                available: false,
+
+                reportFound: false,
+
+                source:
+                  "VirusTotal",
+
+                message:
+                  `VirusTotal returned HTTP ${virusTotalResponse.status}.`
+
+              };
+
+            }
+
+          }
+
+
+        }
+
+        catch (error) {
+
+          console.error(
+            "VirusTotal URL error:",
+            error.message
           );
 
 
-        if (virusTotalResponse.ok) {
-
-          const virusTotalData =
-            await virusTotalResponse.json();
-
-          const attributes =
-            virusTotalData.data?.attributes || {};
-
-          const stats =
-            attributes.last_analysis_stats || {};
-
-
-          const malicious =
-            stats.malicious || 0;
-
-          const suspicious =
-            stats.suspicious || 0;
-
-          const harmless =
-            stats.harmless || 0;
-
-          const undetected =
-            stats.undetected || 0;
-
-
-          let finalRiskScore =
-            basicAnalysis.riskScore;
-
-
-          if (malicious > 0) {
-
-            finalRiskScore =
-              Math.max(
-                finalRiskScore,
-                80
-              );
-
-          } else if (suspicious > 0) {
-
-            finalRiskScore =
-              Math.max(
-                finalRiskScore,
-                60
-              );
-          }
-
-
-          finalRiskScore =
-            Math.min(
-              finalRiskScore,
-              100
-            );
-
-
-          let finalRiskLevel =
-            "LOW";
-
-
-          if (finalRiskScore > 60) {
-
-            finalRiskLevel =
-              "HIGH";
-
-          } else if (finalRiskScore > 30) {
-
-            finalRiskLevel =
-              "MEDIUM";
-          }
-
-
           threatIntel = {
 
-            available: true,
+            used: true,
 
-            reportFound: true,
+            available: false,
 
-            malicious,
+            reportFound: false,
 
-            suspicious,
-
-            harmless,
-
-            undetected,
+            source:
+              "VirusTotal",
 
             message:
-              malicious > 0
-                ? "VirusTotal reported malicious detections."
-                : suspicious > 0
-                ? "VirusTotal reported suspicious detections."
-                : "No malicious or suspicious detections were reported in the available VirusTotal analysis."
+              "VirusTotal connection failed. CyberShield's own analysis was still completed."
+
           };
 
-
-          return res.json({
-
-            status: "success",
-
-            url: parsedURL.href,
-
-            riskScore:
-              finalRiskScore,
-
-            riskLevel:
-              finalRiskLevel,
-
-            warnings:
-              basicAnalysis.warnings,
-
-            positiveChecks:
-              basicAnalysis.positiveChecks,
-
-            threatIntel,
-
-            message:
-              finalRiskLevel === "HIGH"
-                ? "The URL has significant risk indicators."
-                : finalRiskLevel === "MEDIUM"
-                ? "The URL has some suspicious indicators."
-                : "No major suspicious indicators were detected by the current checks.",
-
-            disclaimer:
-              "This is a preliminary risk assessment and does not guarantee that a website is completely safe."
-          });
         }
 
+      }
 
-        if (
-          virusTotalResponse.status === 404
-        ) {
 
-          threatIntel = {
+      /* ---------------------------------------------
+         8. VirusTotal required but no API key
+      --------------------------------------------- */
 
-            available: true,
-
-            reportFound: false,
-
-            message:
-              "No existing VirusTotal report was found for this URL."
-          };
-
-        } else if (
-          virusTotalResponse.status === 429
-        ) {
-
-          threatIntel = {
-
-            available: false,
-
-            reportFound: false,
-
-            message:
-              "VirusTotal rate limit was reached. Basic URL analysis was still completed."
-          };
-
-        } else if (
-          virusTotalResponse.status === 401 ||
-          virusTotalResponse.status === 403
-        ) {
-
-          threatIntel = {
-
-            available: false,
-
-            reportFound: false,
-
-            message:
-              "VirusTotal API authentication failed. Check your API key."
-          };
-
-        } else {
-
-          threatIntel = {
-
-            available: false,
-
-            reportFound: false,
-
-            message:
-              `VirusTotal returned HTTP ${virusTotalResponse.status}.`
-          };
-        }
-
-      } catch (error) {
-
-        console.log(
-          "VirusTotal URL error:",
-          error.message
-        );
+      else if (
+        needsVirusTotal &&
+        !apiKey
+      ) {
 
         threatIntel = {
+
+          used: false,
 
           available: false,
 
           reportFound: false,
 
-          message:
-            "VirusTotal connection failed. Basic URL analysis was still performed."
+          reason:
+            "CyberShield did not have enough information for a confident assessment, but VirusTotal verification is not configured."
+
         };
+
       }
+
+
+      /* ---------------------------------------------
+         9. Return CyberShield result
+      --------------------------------------------- */
+
+      return res.json({
+
+        status:
+          "success",
+
+        url:
+          result.url,
+
+        riskScore:
+          result.score,
+
+        riskLevel:
+          result.level,
+
+        warnings:
+          result.warnings || [],
+
+        positiveChecks:
+          result.positiveChecks || [],
+
+        findings:
+          result.findings || [],
+
+        analysis:
+          result.analysis || {},
+
+        domain:
+          result.domain || {},
+
+        typosquatting:
+          result.typosquatting || {},
+
+        redirects:
+          result.redirects || {},
+
+        informationQuality: {
+
+          score:
+            informationScore,
+
+          enoughInformation,
+
+          virusTotalUsed:
+            threatIntel.used
+
+        },
+
+        threatIntel,
+
+        message:
+          result.recommendation ||
+          "URL analysis completed.",
+
+        disclaimer:
+          result.disclaimer ||
+          "This is a preliminary risk assessment and does not guarantee that a website is completely safe."
+
+      });
+
     }
 
+    catch (error) {
 
-    return res.json({
-
-      status: "success",
-
-      url: parsedURL.href,
-
-      riskScore:
-        basicAnalysis.riskScore,
-
-      riskLevel:
-        basicAnalysis.riskLevel,
-
-      warnings:
-        basicAnalysis.warnings,
-
-      positiveChecks:
-        basicAnalysis.positiveChecks,
-
-      threatIntel,
-
-      message:
-        basicAnalysis.riskLevel === "HIGH"
-          ? "The URL has significant risk indicators."
-          : basicAnalysis.riskLevel === "MEDIUM"
-          ? "The URL has some suspicious indicators."
-          : "No major suspicious indicators were detected by the basic checks.",
-
-      disclaimer:
-        "This is a preliminary risk assessment. It does not guarantee that a website is completely safe."
-    });
+      console.error(
+        "URL CHECK ERROR:",
+        error
+      );
 
 
-  } catch (error) {
+      return res.status(500).json({
 
-    console.error(
-      "URL check error:",
-      error
-    );
+        status:
+          "error",
 
-    res.status(500).json({
+        message:
+          "An error occurred while analyzing the URL."
 
-      status: "error",
+      });
 
-      message:
-        "Something went wrong while checking the URL."
-    });
+    }
+
   }
-});
+);
 
 
 /* =====================================================
-   SAFE DOWNLOAD CHECKER
+   SAFE DOWNLOAD / FILE CHECKER
 ===================================================== */
 
 const suspiciousExtensions = [
@@ -593,6 +1084,7 @@ function analyzeFile(file) {
   let riskScore = 0;
 
   const warnings = [];
+
   const checksPassed = [];
 
 
@@ -603,7 +1095,9 @@ function analyzeFile(file) {
     originalName.toLowerCase();
 
   const extension =
-    path.extname(lowerName);
+    path.extname(
+      lowerName
+    );
 
 
   /* FILE NAME */
@@ -616,10 +1110,13 @@ function analyzeFile(file) {
   /* FILE SIZE */
 
   const sizeInMB =
-    file.size / (1024 * 1024);
+    file.size /
+    (1024 * 1024);
 
 
-  if (sizeInMB > 25) {
+  if (
+    sizeInMB > 25
+  ) {
 
     riskScore += 10;
 
@@ -627,15 +1124,18 @@ function analyzeFile(file) {
       "File is larger than 25 MB"
     );
 
-  } else {
+  }
+
+  else {
 
     checksPassed.push(
       "File size is within the normal range"
     );
+
   }
 
 
-  /* EXTENSION */
+  /* FILE EXTENSION */
 
   if (
     suspiciousExtensions.includes(
@@ -649,7 +1149,9 @@ function analyzeFile(file) {
       `Potentially dangerous file extension detected: ${extension}`
     );
 
-  } else if (
+  }
+
+  else if (
     commonSafeExtensions.includes(
       extension
     )
@@ -659,13 +1161,16 @@ function analyzeFile(file) {
       `Common file extension detected: ${extension}`
     );
 
-  } else {
+  }
+
+  else {
 
     riskScore += 10;
 
     warnings.push(
       `Unrecognized file extension: ${extension || "none"}`
     );
+
   }
 
 
@@ -686,6 +1191,7 @@ function analyzeFile(file) {
     warnings.push(
       "Suspicious double file extension detected"
     );
+
   }
 
 
@@ -700,6 +1206,7 @@ function analyzeFile(file) {
     warnings.push(
       "File name begins with a dot"
     );
+
   }
 
 
@@ -714,15 +1221,22 @@ function analyzeFile(file) {
     "LOW";
 
 
-  if (riskScore > 60) {
+  if (
+    riskScore >= 60
+  ) {
 
     riskLevel =
       "HIGH";
 
-  } else if (riskScore > 30) {
+  }
+
+  else if (
+    riskScore >= 30
+  ) {
 
     riskLevel =
       "MEDIUM";
+
   }
 
 
@@ -744,10 +1258,13 @@ function analyzeFile(file) {
       file.size,
 
     fileSizeMB:
-      Number(sizeInMB.toFixed(2)),
+      Number(
+        sizeInMB.toFixed(2)
+      ),
 
     extension:
-      extension || "No extension",
+      extension ||
+      "No extension",
 
     sha256,
 
@@ -758,30 +1275,39 @@ function analyzeFile(file) {
     warnings,
 
     checksPassed
+
   };
+
 }
 
 
 /* =====================================================
-   FILE CHECK + VIRUSTOTAL HASH LOOKUP
+   FILE CHECK API
 ===================================================== */
 
 app.post(
   "/api/file-check",
+
   upload.single("file"),
+
   async (req, res) => {
 
     try {
 
-      if (!req.file) {
+      if (
+        !req.file
+      ) {
 
         return res.status(400).json({
 
-          status: "error",
+          status:
+            "error",
 
           message:
             "Please select a file to analyze."
+
         });
+
       }
 
 
@@ -794,12 +1320,14 @@ app.post(
       /* LOCAL ANALYSIS */
 
       const analysis =
-        analyzeFile(req.file);
+        analyzeFile(
+          req.file
+        );
 
 
-      /* =================================================
-         VIRUSTOTAL HASH LOOKUP
-      ================================================= */
+      /* ---------------------------------------------
+         VirusTotal file hash lookup
+      --------------------------------------------- */
 
       const apiKey =
         process.env.VIRUSTOTAL_API_KEY;
@@ -813,45 +1341,58 @@ app.post(
 
         message:
           "VirusTotal API key is not configured."
+
       };
 
 
-      if (apiKey) {
+      if (
+        apiKey
+      ) {
 
         try {
 
-          console.log(
-            "Checking VirusTotal file hash..."
-          );
-
-
           const virusTotalResponse =
             await fetch(
+
               `https://www.virustotal.com/api/v3/files/${analysis.sha256}`,
+
               {
+
                 method: "GET",
 
                 headers: {
-                  "x-apikey": apiKey
+
+                  "x-apikey":
+                    apiKey
+
                 }
+
               }
+
             );
 
 
           /* REPORT FOUND */
 
-          if (virusTotalResponse.ok) {
+          if (
+            virusTotalResponse.ok
+          ) {
 
             const virusTotalData =
               await virusTotalResponse.json();
 
 
             const attributes =
-              virusTotalData.data?.attributes || {};
+              virusTotalData
+                .data
+                ?.attributes ||
+              {};
 
 
             const stats =
-              attributes.last_analysis_stats || {};
+              attributes
+                .last_analysis_stats ||
+              {};
 
 
             const malicious =
@@ -867,13 +1408,13 @@ app.post(
               stats.undetected || 0;
 
 
-            /* ADJUST SCORE */
-
             let finalRiskScore =
               analysis.riskScore;
 
 
-            if (malicious > 0) {
+            if (
+              malicious > 0
+            ) {
 
               finalRiskScore =
                 Math.max(
@@ -881,13 +1422,18 @@ app.post(
                   80
                 );
 
-            } else if (suspicious > 0) {
+            }
+
+            else if (
+              suspicious > 0
+            ) {
 
               finalRiskScore =
                 Math.max(
                   finalRiskScore,
                   60
                 );
+
             }
 
 
@@ -898,51 +1444,65 @@ app.post(
               );
 
 
-            /* FINAL LEVEL */
-
             let finalRiskLevel =
               "LOW";
 
 
-            if (finalRiskScore > 60) {
+            if (
+              finalRiskScore >= 60
+            ) {
 
               finalRiskLevel =
                 "HIGH";
 
-            } else if (finalRiskScore > 30) {
+            }
+
+            else if (
+              finalRiskScore >= 30
+            ) {
 
               finalRiskLevel =
                 "MEDIUM";
+
             }
 
-
-            /* MESSAGE */
 
             let message;
 
 
-            if (malicious > 0) {
+            if (
+              malicious > 0
+            ) {
 
               message =
                 "VirusTotal reported malicious detections for this file hash.";
 
-            } else if (suspicious > 0) {
+            }
+
+            else if (
+              suspicious > 0
+            ) {
 
               message =
                 "VirusTotal reported suspicious detections for this file hash.";
 
-            } else {
+            }
+
+            else {
 
               message =
                 "No malicious or suspicious detections were reported in the available VirusTotal analysis.";
+
             }
 
 
             threatIntel = {
 
-              available: true,
+              available:
+                true,
 
-              reportFound: true,
+              reportFound:
+                true,
 
               malicious,
 
@@ -953,12 +1513,14 @@ app.post(
               undetected,
 
               message
+
             };
 
 
             return res.json({
 
-              status: "success",
+              status:
+                "success",
 
               message:
                 "File analysis completed.",
@@ -972,88 +1534,111 @@ app.post(
 
                 riskLevel:
                   finalRiskLevel
+
               },
 
               threatIntel,
 
               disclaimer:
                 "This is a preliminary file risk assessment. A VirusTotal result reflects the available report for this hash and does not guarantee that a file is completely safe."
+
             });
+
           }
 
 
-          /* REPORT NOT FOUND */
+          /* NO REPORT */
 
           if (
-            virusTotalResponse.status === 404
+            virusTotalResponse.status ===
+            404
           ) {
 
             threatIntel = {
 
-              available: true,
+              available:
+                true,
 
-              reportFound: false,
+              reportFound:
+                false,
 
               message:
                 "No existing VirusTotal report was found for this file hash."
+
             };
+
           }
 
 
           /* RATE LIMIT */
 
           else if (
-            virusTotalResponse.status === 429
+            virusTotalResponse.status ===
+            429
           ) {
 
             threatIntel = {
 
-              available: false,
+              available:
+                false,
 
-              reportFound: false,
+              reportFound:
+                false,
 
               message:
                 "VirusTotal rate limit was reached. Local file analysis was still completed."
+
             };
+
           }
 
 
           /* AUTH ERROR */
 
           else if (
-            virusTotalResponse.status === 401 ||
-            virusTotalResponse.status === 403
+            virusTotalResponse.status ===
+              401 ||
+            virusTotalResponse.status ===
+              403
           ) {
 
             threatIntel = {
 
-              available: false,
+              available:
+                false,
 
-              reportFound: false,
+              reportFound:
+                false,
 
               message:
                 "VirusTotal API authentication failed. Check your VIRUSTOTAL_API_KEY."
+
             };
+
           }
 
-
-          /* OTHER ERROR */
 
           else {
 
             threatIntel = {
 
-              available: false,
+              available:
+                false,
 
-              reportFound: false,
+              reportFound:
+                false,
 
               message:
                 `VirusTotal returned HTTP ${virusTotalResponse.status}.`
+
             };
+
           }
 
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
           console.error(
             "VirusTotal file lookup error:",
@@ -1063,22 +1648,30 @@ app.post(
 
           threatIntel = {
 
-            available: false,
+            available:
+              false,
 
-            reportFound: false,
+            reportFound:
+              false,
 
             message:
               "VirusTotal could not be reached. Local file analysis was still completed."
+
           };
+
         }
+
       }
 
 
-      /* RETURN LOCAL RESULT */
+      /* ---------------------------------------------
+         Return local analysis
+      --------------------------------------------- */
 
       return res.json({
 
-        status: "success",
+        status:
+          "success",
 
         message:
           "File analysis completed.",
@@ -1089,49 +1682,66 @@ app.post(
 
         disclaimer:
           "This is a preliminary file risk assessment. It does not guarantee that a file is completely safe."
+
       });
 
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
       console.error(
-        "File analysis error:",
+        "FILE CHECK ERROR:",
         error
       );
 
 
-      res.status(500).json({
+      return res.status(500).json({
 
-        status: "error",
+        status:
+          "error",
 
         message:
           "Something went wrong while analyzing the file."
+
       });
+
     }
+
   }
 );
 
 
 /* =====================================================
-   DIGITAL FOOTPRINT CHECKER
+   DIGITAL FOOTPRINT ANALYSIS
 ===================================================== */
 
 function analyzeDigitalFootprint({
+
   username,
+
   email,
+
   fullName,
+
   phone
+
 }) {
 
   let riskScore = 0;
 
   const warnings = [];
+
   const checksPassed = [];
 
 
-  /* USERNAME */
+  /* ---------------------------------------------
+     USERNAME
+  --------------------------------------------- */
 
-  if (username) {
+  if (
+    username
+  ) {
 
     const cleanUsername =
       username.trim();
@@ -1151,11 +1761,14 @@ function analyzeDigitalFootprint({
       warnings.push(
         "Username is very short and may be easy to associate with other accounts."
       );
+
     }
 
 
     if (
-      /\d{2,}/.test(cleanUsername)
+      /\d{2,}/.test(
+        cleanUsername
+      )
     ) {
 
       riskScore += 5;
@@ -1163,6 +1776,7 @@ function analyzeDigitalFootprint({
       warnings.push(
         "Username contains multiple numbers."
       );
+
     }
 
 
@@ -1177,22 +1791,32 @@ function analyzeDigitalFootprint({
       warnings.push(
         "Username contains a privileged or official-looking term."
       );
+
     }
 
-  } else {
+  }
+
+  else {
 
     checksPassed.push(
       "No username was provided."
     );
+
   }
 
 
-  /* EMAIL */
+  /* ---------------------------------------------
+     EMAIL
+  --------------------------------------------- */
 
-  if (email) {
+  if (
+    email
+  ) {
 
     const cleanEmail =
-      email.trim().toLowerCase();
+      email
+        .trim()
+        .toLowerCase();
 
 
     const emailPattern =
@@ -1200,7 +1824,9 @@ function analyzeDigitalFootprint({
 
 
     if (
-      !emailPattern.test(cleanEmail)
+      !emailPattern.test(
+        cleanEmail
+      )
     ) {
 
       riskScore += 20;
@@ -1209,7 +1835,9 @@ function analyzeDigitalFootprint({
         "The email address format appears invalid."
       );
 
-    } else {
+    }
+
+    else {
 
       checksPassed.push(
         "Email format is valid"
@@ -1223,12 +1851,15 @@ function analyzeDigitalFootprint({
       const localPart =
         emailParts[0];
 
+
       const domain =
         emailParts[1];
 
 
       if (
-        /\d{4}/.test(localPart)
+        /\d{4}/.test(
+          localPart
+        )
       ) {
 
         riskScore += 5;
@@ -1236,51 +1867,71 @@ function analyzeDigitalFootprint({
         warnings.push(
           "Email username contains a four-digit number that may represent personal information."
         );
+
       }
 
 
       const commonProviders = [
 
         "gmail.com",
+
         "outlook.com",
+
         "hotmail.com",
+
         "yahoo.com",
+
         "icloud.com",
+
         "proton.me",
+
         "protonmail.com"
 
       ];
 
 
       if (
-        commonProviders.includes(domain)
+        commonProviders.includes(
+          domain
+        )
       ) {
 
         checksPassed.push(
           "Email uses a common public email provider"
         );
 
-      } else {
+      }
+
+      else {
 
         riskScore += 5;
 
         warnings.push(
           "Email uses a custom or less common domain."
         );
+
       }
+
     }
 
-  } else {
+  }
+
+  else {
 
     checksPassed.push(
       "No email address was provided."
     );
+
   }
 
 
-  /* FULL NAME */
+  /* ---------------------------------------------
+     FULL NAME
+  --------------------------------------------- */
 
-  if (fullName) {
+  if (
+    fullName
+  ) {
 
     const cleanName =
       fullName.trim();
@@ -1292,7 +1943,9 @@ function analyzeDigitalFootprint({
 
 
     const nameParts =
-      cleanName.split(/\s+/);
+      cleanName.split(
+        /\s+/
+      );
 
 
     if (
@@ -1304,22 +1957,33 @@ function analyzeDigitalFootprint({
       warnings.push(
         "A full name was provided. Combining a full name with other public information can increase digital exposure."
       );
+
     }
 
-  } else {
+  }
+
+  else {
 
     checksPassed.push(
       "No full name was provided."
     );
+
   }
 
 
-  /* PHONE */
+  /* ---------------------------------------------
+     PHONE
+  --------------------------------------------- */
 
-  if (phone) {
+  if (
+    phone
+  ) {
 
     const cleanPhone =
-      phone.replace(/\D/g, "");
+      phone.replace(
+        /\D/g,
+        ""
+      );
 
 
     if (
@@ -1332,7 +1996,9 @@ function analyzeDigitalFootprint({
         "The phone number appears too short."
       );
 
-    } else {
+    }
+
+    else {
 
       riskScore += 10;
 
@@ -1340,26 +2006,36 @@ function analyzeDigitalFootprint({
         "A phone number was provided. Phone numbers can be sensitive personal information."
       );
 
+
       checksPassed.push(
         "Phone number format analyzed"
       );
+
     }
 
-  } else {
+  }
+
+  else {
 
     checksPassed.push(
       "No phone number was provided."
     );
+
   }
 
 
-  /* COMBINATION */
+  /* ---------------------------------------------
+     COMBINATION OF IDENTIFIERS
+  --------------------------------------------- */
 
   const suppliedFields = [
 
     username,
+
     email,
+
     fullName,
+
     phone
 
   ].filter(Boolean).length;
@@ -1374,6 +2050,7 @@ function analyzeDigitalFootprint({
     warnings.push(
       "Multiple personal identifiers were provided together, which can increase privacy exposure."
     );
+
   }
 
 
@@ -1389,18 +2066,21 @@ function analyzeDigitalFootprint({
 
 
   if (
-    riskScore > 60
+    riskScore >= 60
   ) {
 
     riskLevel =
       "HIGH";
 
-  } else if (
-    riskScore > 30
+  }
+
+  else if (
+    riskScore >= 30
   ) {
 
     riskLevel =
       "MEDIUM";
+
   }
 
 
@@ -1414,17 +2094,22 @@ function analyzeDigitalFootprint({
     assessment =
       "The information provided contains several privacy exposure indicators. Consider reducing the amount of personal information publicly associated with your online accounts.";
 
-  } else if (
+  }
+
+  else if (
     riskLevel === "MEDIUM"
   ) {
 
     assessment =
       "Some privacy exposure indicators were detected. Review what personal information is publicly associated with your online accounts.";
 
-  } else {
+  }
+
+  else {
 
     assessment =
       "No major privacy exposure indicators were detected by the current checks.";
+
   }
 
 
@@ -1442,15 +2127,22 @@ function analyzeDigitalFootprint({
 
     fieldsAnalyzed: {
 
-      username: Boolean(username),
+      username:
+        Boolean(username),
 
-      email: Boolean(email),
+      email:
+        Boolean(email),
 
-      fullName: Boolean(fullName),
+      fullName:
+        Boolean(fullName),
 
-      phone: Boolean(phone)
+      phone:
+        Boolean(phone)
+
     }
+
   };
+
 }
 
 
@@ -1465,10 +2157,15 @@ app.post(
     try {
 
       const {
+
         username,
+
         email,
+
         fullName,
+
         phone
+
       } = req.body;
 
 
@@ -1479,15 +2176,20 @@ app.post(
         phone;
 
 
-      if (!hasInformation) {
+      if (
+        !hasInformation
+      ) {
 
         return res.status(400).json({
 
-          status: "error",
+          status:
+            "error",
 
           message:
             "Please provide at least one piece of information to analyze."
+
         });
+
       }
 
 
@@ -1495,15 +2197,20 @@ app.post(
         analyzeDigitalFootprint({
 
           username,
+
           email,
+
           fullName,
+
           phone
+
         });
 
 
-      res.json({
+      return res.json({
 
-        status: "success",
+        status:
+          "success",
 
         message:
           "Digital footprint analysis completed.",
@@ -1512,61 +2219,191 @@ app.post(
 
         disclaimer:
           "This analysis is based only on the information entered and basic privacy indicators. It does not confirm that the information appears on public websites or in a data breach."
+
       });
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
       console.error(
-        "Digital footprint error:",
+        "DIGITAL FOOTPRINT ERROR:",
         error
       );
 
 
-      res.status(500).json({
+      return res.status(500).json({
 
-        status: "error",
+        status:
+          "error",
 
         message:
           "Something went wrong while analyzing the digital footprint."
+
       });
+
     }
+
   }
 );
 
 
 /* =====================================================
-   MONGODB
+   MONGODB CONNECTION
 ===================================================== */
 
-mongoose
-  .connect(process.env.MONGO_URI)
+async function connectMongoDB() {
 
-  .then(() => {
+  const mongoURI =
+    process.env.MONGO_URI;
+
+
+  /*
+   * IMPORTANT:
+   *
+   * MongoDB should NOT prevent the
+   * Express server from starting.
+   */
+
+  if (
+    !mongoURI
+  ) {
 
     console.log(
-      "MongoDB connected successfully"
+      "MONGO_URI not configured."
+    );
+
+    console.log(
+      "Starting backend without MongoDB."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    await mongoose.connect(
+      mongoURI
     );
 
 
-    app.listen(
-       PORT,  
-        "0.0.0.0",
-      () => {
-
-        console.log(
-          `CyberShield server running on port ${PORT}`
-        );
-      }
+    console.log(
+      "MongoDB connected successfully."
     );
 
-  })
+  }
 
-  .catch((error) => {
+  catch (error) {
 
     console.error(
       "MongoDB connection failed:",
       error.message
     );
 
-  });
+    console.log(
+      "Backend will continue running without MongoDB."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   GLOBAL ERROR HANDLER
+===================================================== */
+
+app.use(
+  (
+    error,
+    req,
+    res,
+    next
+  ) => {
+
+    console.error(
+      "GLOBAL ERROR:",
+      error.message
+    );
+
+
+    if (
+      error.message ===
+      "Not allowed by CORS"
+    ) {
+
+      return res.status(403).json({
+
+        status:
+          "error",
+
+        message:
+          "Request blocked by CORS policy."
+
+      });
+
+    }
+
+
+    return res.status(500).json({
+
+      status:
+        "error",
+
+      message:
+        "Internal server error."
+
+    });
+
+  }
+);
+
+
+/* =====================================================
+   START SERVER
+===================================================== */
+
+async function startServer() {
+
+  /*
+   * Start HTTP server FIRST.
+   *
+   * This is important for Render.
+   */
+
+  app.listen(
+
+    PORT,
+
+    "0.0.0.0",
+
+    () => {
+
+      console.log(
+        `CyberShield backend running on port ${PORT}`
+      );
+
+      console.log(
+        `Frontend allowed: ${FRONTEND_URL}`
+      );
+
+    }
+
+  );
+
+
+  /*
+   * Connect MongoDB separately.
+   *
+   * MongoDB failure should NOT stop
+   * the Express server.
+   */
+
+  await connectMongoDB();
+
+}
+
+
+startServer();
