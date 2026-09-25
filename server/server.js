@@ -760,8 +760,9 @@ const commonSafeExtensions = [
 
 function analyzeFile(file) {
   let riskScore = 0;
-
-  const warnings = [];
+  const riskBreakdown = [];
+ 
+ const warnings = [];
 
   const checksPassed = [];
 
@@ -773,6 +774,72 @@ function analyzeFile(file) {
 
   const extension =
     path.extname(lowerName);
+
+      /* ACTUAL FILE SIGNATURE */
+
+  function detectFileType(buffer) {
+    if (
+      buffer.length >= 4 &&
+      buffer.slice(0, 4).toString() === "%PDF"
+    ) {
+      return ".pdf";
+    }
+
+    if (
+      buffer.length >= 8 &&
+      buffer
+        .slice(0, 8)
+        .equals(
+          Buffer.from([
+            0x89, 0x50, 0x4e, 0x47,
+            0x0d, 0x0a, 0x1a, 0x0a,
+          ])
+        )
+    ) {
+      return ".png";
+    }
+
+    if (
+      buffer.length >= 3 &&
+      buffer
+        .slice(0, 3)
+        .equals(
+          Buffer.from([
+            0xff, 0xd8, 0xff,
+          ])
+        )
+    ) {
+      return ".jpg";
+    }
+
+    if (
+      buffer.length >= 6 &&
+      (
+        buffer.slice(0, 6).toString() === "GIF87a" ||
+        buffer.slice(0, 6).toString() === "GIF89a"
+      )
+    ) {
+      return ".gif";
+    }
+
+    if (
+      buffer.length >= 4 &&
+      buffer
+        .slice(0, 4)
+        .equals(
+          Buffer.from([
+            0x50, 0x4b, 0x03, 0x04,
+          ])
+        )
+    ) {
+      return "ZIP-based container";
+    }
+
+    return null;
+  }
+
+  const detectedType =
+    detectFileType(file.buffer);
 
   /* FILE NAME */
 
@@ -807,6 +874,11 @@ function analyzeFile(file) {
   ) {
     riskScore += 40;
 
+    riskBreakdown.push({
+  reason: "Suspicious file extension",
+  points: 40
+});
+
     warnings.push(
       `Potentially dangerous file extension detected: ${extension}`
     );
@@ -839,11 +911,50 @@ function analyzeFile(file) {
     )
   ) {
     riskScore += 35;
+    riskBreakdown.push({
+  reason: "Double extension detected",
+  points: 35
+});
 
     warnings.push(
       "Suspicious double file extension detected"
     );
   }
+  /* FILE TYPE / EXTENSION MATCH */
+
+if (detectedType) {
+  if (
+    extension === detectedType ||
+    (detectedType === ".jpg" && extension === ".jpeg")
+  ) {
+    checksPassed.push(
+      `File signature matches extension: ${detectedType}`
+    );
+  } else if (
+    detectedType === "ZIP-based container" &&
+    [".zip", ".docx", ".xlsx", ".pptx"].includes(extension)
+  ) {
+    checksPassed.push(
+      "File signature matches a ZIP-based container"
+    );
+  } else {
+    riskScore += 25;
+    riskBreakdown.push({
+  reason: "File signature does not match extension",
+  points: 25
+});
+
+    warnings.push(
+      `File content appears to be ${detectedType}, but the filename uses ${
+        extension || "no extension"
+      } extension.`
+    );
+  }
+} else {
+  warnings.push(
+    "The file type could not be identified from its signature."
+  );
+}
 
   /* HIDDEN FILE */
 
@@ -897,9 +1008,15 @@ function analyzeFile(file) {
       extension ||
       "No extension",
 
+      detectedType:
+  detectedType ||
+  "Unknown",
+
     sha256,
 
     riskScore,
+
+    riskBreakdown,
 
     riskLevel,
 
