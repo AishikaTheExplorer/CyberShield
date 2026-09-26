@@ -1,4 +1,4 @@
-```js
+
 const API_TIMEOUT = 5000;
 
 async function fetchWithTimeout(url, options = {}) {
@@ -239,4 +239,3 @@ module.exports = {
   githubFallback,
   runFallback,
 };
-```
