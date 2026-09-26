@@ -676,9 +676,7 @@ function App() {
 
               <div className="result-box error-box">
 
-                <h2>
-                  ⚠️ Error
-                </h2>
+                <h2>Error</h2>
 
                 <p>
                   {fileResult.message}
@@ -778,9 +776,7 @@ function App() {
 
                     <div className="analysis-section">
 
-                      <h3>
-                        ✅ Checks Passed
-                      </h3>
+                      <h3 className="analysis-title analysis-title-passed">Checks passed</h3>
 
                       <ul>
 
@@ -808,9 +804,7 @@ function App() {
 
                     <div className="analysis-section">
 
-                      <h3>
-                        ⚠️ Warnings
-                      </h3>
+                      <h3 className="analysis-title analysis-title-warning">Warnings</h3>
 
                       <ul>
 
@@ -858,9 +852,7 @@ function App() {
 
                   <div className="threat-intel">
 
-                    <h2>
-                      🛡️ VirusTotal Threat Intelligence
-                    </h2>
+                    <h2>VirusTotal threat intelligence</h2>
 
 
                     {!fileResult.threatIntel.available && (
@@ -905,9 +897,7 @@ function App() {
 
                           <p>
 
-                            <strong>
-                              🔴 Malicious:
-                            </strong>{" "}
+                            <strong className="vt-danger">Malicious:</strong>{" "}
 
                             {fileResult.threatIntel.malicious}
 
@@ -916,9 +906,7 @@ function App() {
 
                           <p>
 
-                            <strong>
-                              🟠 Suspicious:
-                            </strong>{" "}
+                            <strong className="vt-warning">Suspicious:</strong>{" "}
 
                             {fileResult.threatIntel.suspicious}
 
@@ -927,9 +915,7 @@ function App() {
 
                           <p>
 
-                            <strong>
-                              🟢 Harmless:
-                            </strong>{" "}
+                            <strong className="vt-safe">Harmless:</strong>{" "}
 
                             {fileResult.threatIntel.harmless}
 
@@ -938,9 +924,7 @@ function App() {
 
                           <p>
 
-                            <strong>
-                              ⚪ Undetected:
-                            </strong>{" "}
+                            <strong className="vt-neutral">Undetected:</strong>{" "}
 
                             {fileResult.threatIntel.undetected}
 
@@ -1057,9 +1041,7 @@ function App() {
 
               <div className="result-box error-box">
 
-                <h2>
-                  ⚠️ Error
-                </h2>
+                <h2>Error</h2>
 
                 <p>
                   {urlResult.message}
@@ -1129,9 +1111,7 @@ function App() {
 
                       <div className="analysis-section">
 
-                        <h3>
-                          ✅ Checks Passed
-                        </h3>
+                        <h3 className="analysis-title analysis-title-passed">Checks passed</h3>
 
                         <ul>
 
@@ -1157,9 +1137,7 @@ function App() {
 
                       <div className="analysis-section">
 
-                        <h3>
-                          ⚠️ Warnings
-                        </h3>
+                        <h3 className="analysis-title analysis-title-warning">Warnings</h3>
 
                         <ul>
 
@@ -1197,9 +1175,7 @@ function App() {
 
                     <div className="threat-intel">
 
-                      <h2>
-                        🛡️ VirusTotal Threat Intelligence
-                      </h2>
+                      <h2>VirusTotal threat intelligence</h2>
 
 
                       {urlResult.threatIntel.available &&
@@ -1208,9 +1184,7 @@ function App() {
                           <>
 
                             <p>
-                              <strong>
-                                🔴 Malicious:
-                              </strong>{" "}
+                              <strong className="vt-danger">Malicious:</strong>{" "}
 
                               {
                                 urlResult.threatIntel
@@ -1220,9 +1194,7 @@ function App() {
 
 
                             <p>
-                              <strong>
-                                🟠 Suspicious:
-                              </strong>{" "}
+                              <strong className="vt-warning">Suspicious:</strong>{" "}
 
                               {
                                 urlResult.threatIntel
@@ -1232,9 +1204,7 @@ function App() {
 
 
                             <p>
-                              <strong>
-                                🟢 Harmless:
-                              </strong>{" "}
+                              <strong className="vt-safe">Harmless:</strong>{" "}
 
                               {
                                 urlResult.threatIntel
@@ -1244,9 +1214,7 @@ function App() {
 
 
                             <p>
-                              <strong>
-                                ⚪ Undetected:
-                              </strong>{" "}
+                              <strong className="vt-neutral">Undetected:</strong>{" "}
 
                               {
                                 urlResult.threatIntel
@@ -1325,9 +1293,7 @@ function App() {
 
           <div className="url-checker-panel footprint-panel">
 
-            <h2>
-              👤 Digital Footprint Checker
-            </h2>
+            <h2>Digital Footprint Checker</h2>
 
             <p>
               Enter information you want CyberShield
@@ -1425,7 +1391,7 @@ function App() {
 
             <div className="privacy-note">
 
-              🔒 <strong>Privacy:</strong>{" "}
+              <strong>Privacy:</strong>{" "}
               Your information is analyzed for basic
               digital-exposure indicators. CyberShield
               does not confirm data breaches or guarantee
@@ -1463,9 +1429,7 @@ function App() {
 
               <div className="result-box">
 
-                <h2>
-                  🔍 Digital Footprint Analysis
-                </h2>
+                <h2>Digital footprint analysis</h2>
 
                 <p>
                   CyberShield is analyzing the
@@ -1481,9 +1445,7 @@ function App() {
 
               <div className="result-box error-box">
 
-                <h2>
-                  ⚠️ Error
-                </h2>
+                <h2>Error</h2>
 
                 <p>
                   {footprintResult.message}
@@ -1498,9 +1460,7 @@ function App() {
 
               <div className="result-box">
 
-                <h2>
-                  🔎 Digital Footprint Analysis
-                </h2>
+                <h2>Digital footprint analysis</h2>
 
 
                 {/* RISK SUMMARY */}
@@ -1538,9 +1498,7 @@ function App() {
 
                 <div className="analysis-section">
 
-                  <h3>
-                    👤 Username Exposure
-                  </h3>
+                  <h3>Username exposure</h3>
 
                   {footprintData.username.trim() ? (
 
@@ -1619,9 +1577,7 @@ function App() {
 
                 <div className="analysis-section">
 
-                  <h3>
-                    📧 Email Analysis
-                  </h3>
+                  <h3>Email analysis</h3>
 
                   {footprintData.email.trim() ? (
 
@@ -1712,9 +1668,7 @@ function App() {
 
                 <div className="analysis-section">
 
-                  <h3>
-                    👤 Personal Information
-                  </h3>
+                  <h3>Personal information</h3>
 
                   <ul>
 
@@ -1747,9 +1701,7 @@ function App() {
 
                 <div className="analysis-section">
 
-                  <h3>
-                    ⚠️ Privacy Indicators
-                  </h3>
+                  <h3>Privacy indicators</h3>
 
                   {footprintResult.analysis.warnings?.length > 0 ? (
 
@@ -1785,9 +1737,7 @@ function App() {
 
                 <div className="analysis-section">
 
-                  <h3>
-                    🔍 What This Scan Checks
-                  </h3>
+                  <h3>What this scan checks</h3>
 
                   <ul>
 

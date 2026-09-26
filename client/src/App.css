@@ -1302,6 +1302,20 @@ body {
   font: 600 14px var(--display);
 }
 
+.analysis-title::before {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 9px 2px 0;
+  border-radius: 50%;
+  background: #628d67;
+  content: '';
+}
+
+.analysis-title-warning::before {
+  background: #b68136;
+}
+
 .analysis-section ul {
   padding-left: 19px;
 }
@@ -1387,6 +1401,22 @@ body {
 }
 
 .vt-danger {
+  color: #b34737;
+}
+
+.vt-neutral {
+  color: #75847b !important;
+}
+
+.result-box strong.vt-safe {
+  color: #39714c;
+}
+
+.result-box strong.vt-warning {
+  color: #a66c12;
+}
+
+.result-box strong.vt-danger {
   color: #b34737;
 }
 
