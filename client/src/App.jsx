@@ -334,11 +334,11 @@ function App() {
 
     try {
 
-     const response =
-  await axios.post(
-    "https://cybershield-zdsb.onrender.com/api/digital-footprint",
-    footprintData
-  );
+      const response =
+        await axios.post(
+          "https://cybershield-zdsb.onrender.com/api/digital-footprint",
+          footprintData
+        );
 
 
       setFootprintResult({
@@ -388,17 +388,20 @@ function App() {
     try {
 
       const response =
-        await axios.post(
-          "https://cybershield-zdsb.onrender.com/api/digital-footprint",
-          footprintData
+        await axios.get(
+          "https://cybershield-zdsb.onrender.com/api/test"
         );
 
       setBackendStatus(
         response.data.message
       );
 
-
     } catch (error) {
+
+      console.error(
+        "Backend connection error:",
+        error
+      );
 
       setBackendStatus(
         "Backend connection failed."
