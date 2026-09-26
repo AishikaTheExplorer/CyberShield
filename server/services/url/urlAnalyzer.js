@@ -62,6 +62,8 @@ async function analyzeURL(input) {
                 (item) => item.description
             ),
             findings: risk.findings,
+            riskAdjustments: risk.riskAdjustments,
+            scoreCapped: risk.scoreCapped,
             positiveChecks: [],
             domain: null,
             typosquatting: null,
@@ -162,6 +164,12 @@ async function analyzeURL(input) {
 
         findings:
             risk.findings,
+
+        riskAdjustments:
+            risk.riskAdjustments,
+
+        scoreCapped:
+            risk.scoreCapped,
 
         positiveChecks,
 

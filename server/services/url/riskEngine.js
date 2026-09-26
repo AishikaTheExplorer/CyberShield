@@ -1,3 +1,43 @@
+function getAffectedPart(type) {
+    switch (type) {
+        case "no-https":
+            return "URL protocol";
+        case "ip-address":
+        case "punycode":
+        case "unicode-domain":
+        case "many-subdomains":
+        case "many-hyphens":
+        case "numeric-heavy-domain":
+        case "possible-typosquatting":
+            return "Domain name";
+        case "very-new-domain":
+        case "new-domain":
+        case "young-domain":
+            return "Domain registration age";
+        case "suspicious-tld":
+            return "Domain ending";
+        case "suspicious-port":
+        case "non-standard-port":
+            return "URL port";
+        case "suspicious-path":
+            return "URL path";
+        case "many-parameters":
+            return "URL query parameters";
+        case "large-fragment":
+            return "URL fragment";
+        case "unsafe-redirect-target":
+        case "redirect-loop":
+            return "Redirect destination";
+        case "embedded-credentials":
+            return "URL credentials";
+        case "suspicious-keywords":
+        case "single-suspicious-keyword":
+            return "URL text";
+        default:
+            return "Full URL";
+    }
+}
+
 function calculateRisk({
     patternResult,
     domainResult,
@@ -5,50 +45,46 @@ function calculateRisk({
     redirectResult
 }) {
     const findings = [];
+    const riskAdjustments = [];
+
+    const addFindings = (result, source) => {
+        if (result && Array.isArray(result.findings)) {
+            findings.push(
+                ...result.findings.map((finding) => ({
+                    ...finding,
+                    source,
+                    affectedPart:
+                        finding.affectedPart ||
+                        getAffectedPart(finding.type)
+                }))
+            );
+        }
+    };
 
     /*
      * Collect findings
      */
-    if (
-        patternResult &&
-        Array.isArray(patternResult.findings)
-    ) {
-        findings.push(
-            ...patternResult.findings
-        );
-    }
+    addFindings(patternResult, "URL pattern checks");
+    addFindings(domainResult, "Domain registration check");
+    addFindings(typosquattingResult, "Lookalike domain check");
+    addFindings(redirectResult, "Redirect check");
 
-    if (
-        domainResult &&
-        Array.isArray(domainResult.findings)
-    ) {
-        findings.push(
-            ...domainResult.findings
+    const uniqueFindings =
+        findings.filter(
+            (finding, index, array) =>
+                index ===
+                array.findIndex(
+                    (item) =>
+                        item.type === finding.type &&
+                        item.title === finding.title &&
+                        item.description === finding.description
+                )
         );
-    }
-
-    if (
-        typosquattingResult &&
-        Array.isArray(typosquattingResult.findings)
-    ) {
-        findings.push(
-            ...typosquattingResult.findings
-        );
-    }
-
-    if (
-        redirectResult &&
-        Array.isArray(redirectResult.findings)
-    ) {
-        findings.push(
-            ...redirectResult.findings
-        );
-    }
 
     /*
      * Calculate score
      */
-    let score = findings.reduce(
+    let score = uniqueFindings.reduce(
         (total, finding) =>
             total + Number(finding.points || 0),
         0
@@ -62,19 +98,19 @@ function calculateRisk({
      */
 
     const hasTyposquatting =
-        findings.some(
+        uniqueFindings.some(
             (item) =>
                 item.type === "possible-typosquatting"
         );
 
     const hasEmbeddedCredentials =
-        findings.some(
+        uniqueFindings.some(
             (item) =>
                 item.type === "embedded-credentials"
         );
 
     const hasIP =
-        findings.some(
+        uniqueFindings.some(
             (item) =>
                 item.type === "ip-address"
         );
@@ -88,6 +124,10 @@ function calculateRisk({
         hasEmbeddedCredentials
     ) {
         score += 15;
+        riskAdjustments.push({
+            reason: "Lookalike domain combined with credentials in the URL",
+            points: 15
+        });
     }
 
     if (
@@ -95,12 +135,17 @@ function calculateRisk({
         hasIP
     ) {
         score += 15;
+        riskAdjustments.push({
+            reason: "Lookalike domain combined with an IP address",
+            points: 15
+        });
     }
 
     /*
      * Cap
      */
 
+    const uncappedScore = score;
     score = Math.min(
         Math.max(score, 0),
         100
@@ -142,32 +187,19 @@ function calculateRisk({
      */
 
     const sortedFindings =
-        [...findings].sort(
+        [...uniqueFindings].sort(
             (a, b) =>
                 Number(b.points || 0) -
                 Number(a.points || 0)
-        );
-
-    /*
-     * Remove duplicate messages
-     */
-
-    const uniqueFindings =
-        sortedFindings.filter(
-            (finding, index, array) =>
-                index ===
-                array.findIndex(
-                    (item) =>
-                        item.title === finding.title &&
-                        item.description === finding.description
-                )
         );
 
     return {
         score,
         level,
         recommendation,
-        findings: uniqueFindings
+        findings: sortedFindings,
+        riskAdjustments,
+        scoreCapped: uncappedScore > 100
     };
 }
 

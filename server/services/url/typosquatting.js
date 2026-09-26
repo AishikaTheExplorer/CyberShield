@@ -137,7 +137,17 @@ function analyzeTyposquatting(hostname) {
 
     return {
         detected: matches.length > 0,
-        matches
+        matches,
+        findings: matches.map((match) => ({
+            type: "possible-typosquatting",
+            title: "Possible lookalike domain",
+            description: match.reason,
+            points: 35,
+            details: {
+                submittedDomain: domain,
+                similarDomain: match.domain
+            }
+        }))
     };
 }
 

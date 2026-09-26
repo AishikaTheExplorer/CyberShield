@@ -1132,30 +1132,59 @@ function App() {
                     )}
 
 
-                  {urlResult.warnings
-                    ?.length > 0 && (
+                  <div className="analysis-section score-breakdown">
 
-                      <div className="analysis-section">
+                    <h3 className="analysis-title analysis-title-warning">Why this score</h3>
 
-                        <h3 className="analysis-title analysis-title-warning">Warnings</h3>
-
-                        <ul>
-
-                          {urlResult.warnings.map(
-                            (warning, index) => (
-
-                              <li key={index}>
-                                {warning}
-                              </li>
-
-                            )
-                          )}
-
-                        </ul>
-
-                      </div>
-
+                    {urlResult.findings?.length > 0 ? (
+                      <ul>
+                        {urlResult.findings.map((finding, index) => (
+                          <li className="score-finding" key={`${finding.type || finding.title}-${index}`}>
+                            <div className="score-finding-heading">
+                              <strong>{finding.title || "Risk indicator"}</strong>
+                              <span>+{finding.points || 0} points</span>
+                            </div>
+                            <p>{finding.description}</p>
+                            <p className="score-finding-source">
+                              Checked: {finding.affectedPart || finding.source || "URL"}
+                              {finding.source && finding.affectedPart
+                                ? ` (${finding.source})`
+                                : ""}
+                            </p>
+                            {finding.details?.keywords?.length > 0 && (
+                              <p className="score-finding-source">
+                                Matched URL text: {finding.details.keywords.join(", ")}
+                              </p>
+                            )}
+                            {finding.details?.submittedDomain && (
+                              <p className="score-finding-source">
+                                Compared {finding.details.submittedDomain} with {finding.details.similarDomain}
+                              </p>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : urlResult.warnings?.length > 0 ? (
+                      <ul>
+                        {urlResult.warnings.map((warning, index) => (
+                          <li key={index}>{warning}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No risk indicators contributed to this score.</p>
                     )}
+
+                    {urlResult.riskAdjustments?.map((adjustment, index) => (
+                      <p className="score-adjustment" key={`${adjustment.reason}-${index}`}>
+                        <strong>Additional +{adjustment.points} points:</strong> {adjustment.reason}
+                      </p>
+                    ))}
+
+                    {urlResult.scoreCapped && (
+                      <p className="score-finding-source">The calculated score was capped at 100.</p>
+                    )}
+
+                  </div>
 
 
                   <p className="assessment">

@@ -356,6 +356,56 @@ body {
   line-height: 1.5;
 }
 
+.score-breakdown ul {
+  padding: 0;
+  list-style: none;
+}
+
+.score-finding {
+  padding: 14px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.score-finding:last-child {
+  border-bottom: 0;
+}
+
+.score-finding-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.score-finding-heading span {
+  flex: 0 0 auto;
+  color: #b45309;
+  font-weight: 700;
+}
+
+.score-finding p,
+.score-adjustment {
+  margin: 7px 0 0;
+  font-size: 15px !important;
+}
+
+.score-finding .score-finding-source,
+.score-finding-source {
+  color: #64748b;
+  font-size: 13px !important;
+}
+
+.score-adjustment {
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+@media (max-width: 520px) {
+  .score-finding-heading {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
 
 /* =====================================================
    ASSESSMENT

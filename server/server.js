@@ -494,6 +494,23 @@ app.post("/api/url-check", async (req, res) => {
               findings:
                 result.findings || [],
 
+              riskAdjustments: [
+                ...(result.riskAdjustments || []),
+                ...(finalRiskScore > result.score
+                  ? [{
+                    reason:
+                      malicious > 0
+                        ? "VirusTotal reported malicious detections"
+                        : "VirusTotal reported suspicious detections",
+                    points:
+                      finalRiskScore - result.score,
+                  }]
+                  : []),
+              ],
+
+              scoreCapped:
+                result.scoreCapped || false,
+
               analysis:
                 result.analysis || {},
 
@@ -664,6 +681,12 @@ app.post("/api/url-check", async (req, res) => {
 
       findings:
         result.findings || [],
+
+      riskAdjustments:
+        result.riskAdjustments || [],
+
+      scoreCapped:
+        result.scoreCapped || false,
 
       analysis:
         result.analysis || {},
