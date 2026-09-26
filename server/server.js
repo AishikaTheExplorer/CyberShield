@@ -12,6 +12,7 @@ const crypto = require("crypto");
 const path = require("path");
 
 const analyzeURL = require("./services/url/urlAnalyzer");
+const analyzeFootprint = require("./services/digitalFootprint/footprintAnalyzer");
 
 dotenv.config();
 
@@ -1631,10 +1632,10 @@ app.post(
   async (req, res) => {
     try {
       const {
-        username,
-        email,
-        fullName,
-        phone,
+        username = "",
+        email = "",
+        fullName = "",
+        phone = "",
       } = req.body;
 
       const hasInformation =
@@ -1643,19 +1644,16 @@ app.post(
         fullName ||
         phone;
 
-      if (
-        !hasInformation
-      ) {
+      if (!hasInformation) {
         return res.status(400).json({
           status: "error",
-
           message:
             "Please provide at least one piece of information to analyze.",
         });
       }
 
       const analysis =
-        analyzeDigitalFootprint({
+        await analyzeFootprint({
           username,
           email,
           fullName,
@@ -1664,17 +1662,14 @@ app.post(
 
       return res.json({
         status: "success",
-
         success: true,
-
         message:
           "Digital footprint analysis completed.",
-
         analysis,
-
         disclaimer:
-          "This analysis is based only on the information entered and basic privacy indicators. It does not confirm that the information appears on public websites or in a data breach.",
+          "This scan checks configured public profile URLs and basic privacy indicators. A detected profile URL does not confirm that the account belongs to the person being checked.",
       });
+
     } catch (error) {
       console.error(
         "DIGITAL FOOTPRINT ERROR:",
@@ -1683,14 +1678,12 @@ app.post(
 
       return res.status(500).json({
         status: "error",
-
         message:
           "Something went wrong while analyzing the digital footprint.",
       });
     }
   }
 );
-
 /* =====================================================
    MONGODB CONNECTION
 ===================================================== */
