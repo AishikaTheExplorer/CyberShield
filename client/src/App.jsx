@@ -586,25 +586,33 @@ function App() {
 
         {fileResult?.open && (
 
-          <div className="url-checker-panel">
+          <div className="url-checker-panel tool-workspace file-workspace" aria-labelledby="file-checker-title">
 
-            <h2>
-              📥 Safe Download Checker
-            </h2>
-
-            <p>
-              Select a downloaded file and let
-              CyberShield analyze it.
-            </p>
+            <div className="tool-panel-heading">
+              <div>
+                <p className="eyebrow"><span>01</span> FILE INSPECTION</p>
+                <h2 id="file-checker-title">Safe Download Checker</h2>
+                <p>Select a file to review its local characteristics and available threat intelligence.</p>
+              </div>
+              <span className="tool-panel-code">FILE<br />REVIEW</span>
+            </div>
 
 
             <div className="file-input-container">
-
+              <label className="file-picker-label" htmlFor="file-to-check">
+                <span className="file-picker-mark" aria-hidden="true">+</span>
+                <span className="file-picker-copy">
+                  <strong>Choose a file to inspect</strong>
+                  <span>Browse files on this device</span>
+                </span>
+                <span className="file-picker-action">Browse</span>
+              </label>
               <input
+                id="file-to-check"
+                className="file-picker-input"
                 type="file"
                 onChange={handleFileSelect}
               />
-
             </div>
 
 
@@ -652,13 +660,12 @@ function App() {
 
               <div className="result-box">
 
-                <h2>
-                  🔍 File Analysis
-                </h2>
+                <h2>File inspection in progress</h2>
 
                 <p>
                   CyberShield is analyzing your file...
                 </p>
+                <div className="scan-progress" aria-hidden="true"><span /></div>
 
               </div>
 
@@ -686,9 +693,8 @@ function App() {
 
               <div className="result-box">
 
-                <h2>
-                  🔎 File Security Analysis
-                </h2>
+                <p className="result-kicker">INSPECTION REPORT</p>
+                <h2>File security analysis</h2>
 
 
                 <p>
@@ -981,21 +987,24 @@ function App() {
 
         {urlResult?.open && (
 
-          <div className="url-checker-panel">
+          <div className="url-checker-panel tool-workspace url-workspace" aria-labelledby="url-checker-title">
 
-            <h2>
-              🔗 URL Safety Checker
-            </h2>
-
-            <p>
-              Enter the URL you want CyberShield
-              to analyze.
-            </p>
+            <div className="tool-panel-heading">
+              <div>
+                <p className="eyebrow"><span>02</span> LINK INTELLIGENCE</p>
+                <h2 id="url-checker-title">URL Safety Checker</h2>
+                <p>Inspect a web address for suspicious patterns and available threat intelligence.</p>
+              </div>
+              <span className="tool-panel-code">URL<br />REVIEW</span>
+            </div>
 
 
             <div className="url-input-container">
 
+              <label className="field-label" htmlFor="url-to-check">WEBSITE ADDRESS</label>
+
               <input
+                id="url-to-check"
                 type="text"
                 value={url}
                 onChange={(e) =>
@@ -1032,13 +1041,12 @@ function App() {
 
               <div className="result-box">
 
-                <h2>
-                  🔍 Security Analysis
-                </h2>
+                <h2>Link inspection in progress</h2>
 
                 <p>
                   CyberShield is analyzing the URL...
                 </p>
+                <div className="scan-progress" aria-hidden="true"><span /></div>
 
               </div>
 
@@ -1067,9 +1075,8 @@ function App() {
 
                 <div className="result-box">
 
-                  <h2>
-                    🔎 Security Analysis
-                  </h2>
+                  <p className="result-kicker">INSPECTION REPORT</p>
+                  <h2>URL security analysis</h2>
 
 
                   <p>
