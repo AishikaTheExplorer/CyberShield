@@ -1,3 +1,11 @@
+const {
+  scanWeb,
+} = require("./webSearchScanner");
+
+const {
+  extractAllEvidence,
+  summarizeEvidence,
+} = require("./evidenceExtractor");
 
 const { scanUsername } = require("./usernameScanner");
 const analyzeEmail = require("./emailScanner");
@@ -20,6 +28,19 @@ async function analyzeFootprint({
     usernameStatistics: null,
     emailResult: null,
 
+    webResults: [],
+publicEvidence: [],
+evidenceSummary: {
+  totalSources: 0,
+  usernameMentions: 0,
+  emailMentions: 0,
+  phoneMentions: 0,
+  nameMentions: 0,
+  highImpact: 0,
+  mediumImpact: 0,
+  lowImpact: 0,
+},
+    
     riskScore: 0,
     riskLevel: "LOW",
     warnings: [],
@@ -181,7 +202,31 @@ async function analyzeFootprint({
       "Multiple personal information fields were provided."
     );
   }
+const webResult = await scanWeb({
+  username,
+  email,
+  fullName,
+  phone,
+});
 
+const evidence =
+  extractAllEvidence(
+    webResult.results,
+    {
+      username,
+      email,
+      fullName,
+      phone,
+    }
+  );
+
+result.webResults = webResult.results;
+
+result.publicEvidence = evidence;
+
+result.evidenceSummary =
+  summarizeEvidence(evidence);
+  
   // Limit score
   result.riskScore =
     Math.min(result.riskScore, 100);
