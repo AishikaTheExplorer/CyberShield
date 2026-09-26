@@ -61,25 +61,28 @@ async function analyzeFootprint({
           25
         );
 
-        result.warnings.push(
-          `${foundProfiles.length} possible public profile(s) were found.`
-        );
+         result.warnings.push(
+  foundProfiles.length +
+    " possible public profile(s) were found."
+);
       }
 
       if (
         usernameResult.statistics.blocked > 0
       ) {
         result.warnings.push(
-          `${usernameResult.statistics.blocked} platform(s) blocked automated verification.`
-        );
+  usernameResult.statistics.blocked +
+    " platform(s) blocked automated verification."
+);
       }
 
       if (
         usernameResult.statistics.unknown > 0
       ) {
         result.warnings.push(
-          `${usernameResult.statistics.unknown} platform(s) could not be reliably verified.`
-        );
+  usernameResult.statistics.unknown +
+    " platform(s) could not be reliably verified."
+);
       }
 
     } catch (error) {
