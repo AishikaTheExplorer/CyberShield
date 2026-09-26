@@ -1,4 +1,4 @@
-```js
+
 const footprintSources = require("./footprintSources");
 
 const REQUEST_TIMEOUT = 3000;
@@ -239,4 +239,4 @@ module.exports = {
   scanUsername,
   checkSinglePlatform,
 };
-```
+
