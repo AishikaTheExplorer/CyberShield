@@ -601,96 +601,41 @@ body {
 }
 
 
-/* =====================================================
-   DIGITAL FOOTPRINT
-===================================================== */
+/* =================================================
+   DIGITAL FOOTPRINT INPUT FIX
+================================================= */
 
-.footprint-panel {
-  text-align: left;
-}
-
-.footprint-panel > h2,
-.footprint-panel > p {
-  text-align: center;
-}
-
-.footprint-field {
-  max-width: 700px;
-
-  margin: 18px auto;
-}
-
-.footprint-field label {
-  display: block;
-
-  margin-bottom: 7px;
-
-  font-weight: 700;
-
-  color: #334155;
-
-  font-size: 15px;
-}
-
-.footprint-field input {
+.footprint-input {
   width: 100%;
+  box-sizing: border-box;
 
-  padding: 14px 16px;
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
 
-  border: 1px solid #cbd5e1;
+  caret-color: #1f2937;
 
-  border-radius: 9px;
-
-  font-size: 16px;
-
-  outline: none;
-
-  background: white;
-}
-
-.footprint-field input:focus {
-  border-color: #2563eb;
-
-  box-shadow:
-    0 0 0 3px rgba(37, 99, 235, 0.12);
-}
-
-.privacy-note {
-  max-width: 700px;
-
-  margin: 25px auto;
+  font-size: 18px;
+  font-weight: 500;
 
   padding: 16px;
 
-  background: #eff6ff;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
 
-  border-left: 4px solid #2563eb;
-
-  border-radius: 7px;
-
-  color: #475569;
-
-  line-height: 1.6;
+  outline: none;
 }
 
-
-/* =====================================================
-   LOADING
-===================================================== */
-
-.loading-box {
-  text-align: center;
-
-  padding: 25px;
-
-  color: #475569;
+.footprint-input::placeholder {
+  color: #6b7280 !important;
+  opacity: 1;
 }
 
-.loading-box p {
-  margin-bottom: 0;
+.footprint-input:focus {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+
+  border-color: #2563eb;
 }
-
-
 /* =====================================================
    RESPONSIVE DESIGN
 ===================================================== */

@@ -1288,6 +1288,7 @@ function App() {
               </label>
 
               <input
+                className="footprint-input"
                 type="text"
                 value={footprintData.username}
                 onChange={(e) =>
@@ -1309,6 +1310,7 @@ function App() {
               </label>
 
               <input
+                className="footprint-input"
                 type="email"
                 value={footprintData.email}
                 onChange={(e) =>
@@ -1330,6 +1332,7 @@ function App() {
               </label>
 
               <input
+                className="footprint-input"
                 type="text"
                 value={footprintData.fullName}
                 onChange={(e) =>
@@ -1351,6 +1354,7 @@ function App() {
               </label>
 
               <input
+                className="footprint-input"
                 type="text"
                 value={footprintData.phone}
                 onChange={(e) =>
