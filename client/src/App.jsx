@@ -797,6 +797,32 @@ function App() {
                   )}
 
 
+                {fileResult.analysis.riskBreakdown
+                  ?.length > 0 && (
+
+                    <div className="analysis-section">
+
+                      <h3 className="analysis-title analysis-title-warning">Risk score contributions</h3>
+
+                      <ul>
+
+                        {fileResult.analysis.riskBreakdown.map(
+                          (finding, index) => (
+
+                            <li key={`${finding.reason}-${index}`}>
+                              {finding.reason} (+{finding.points} points)
+                            </li>
+
+                          )
+                        )}
+
+                      </ul>
+
+                    </div>
+
+                  )}
+
+
                 {/* WARNINGS */}
 
                 {fileResult.analysis.warnings

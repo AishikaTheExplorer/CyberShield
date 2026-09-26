@@ -13,6 +13,7 @@ const path = require("path");
 
 const analyzeURL = require("./services/url/urlAnalyzer");
 const analyzeFootprint = require("./services/digitalFootprint/footprintAnalyzer");
+const analyzeFileContent = require("./services/file/contentAnalyzer");
 
 dotenv.config();
 
@@ -859,11 +860,47 @@ function analyzeFile(file) {
       return "ZIP-based container";
     }
 
+    if (
+      buffer.length >= 2 &&
+      buffer.slice(0, 2).toString() === "MZ"
+    ) {
+      return ".exe";
+    }
+
+    if (
+      buffer.length >= 4 &&
+      buffer
+        .slice(0, 4)
+        .equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46]))
+    ) {
+      return "ELF executable";
+    }
+
+    if (
+      buffer.length >= 4 &&
+      ["feedface", "cefaedfe", "feedfacf", "cffaedfe", "cafebabe"].includes(
+        buffer.slice(0, 4).toString("hex")
+      )
+    ) {
+      return "Mach-O executable";
+    }
+
     return null;
   }
 
   const detectedType =
     detectFileType(file.buffer);
+
+  const contentAnalysis =
+    analyzeFileContent(file.buffer, detectedType);
+
+  riskScore += contentAnalysis.riskBreakdown.reduce(
+    (total, finding) => total + finding.points,
+    0
+  );
+  riskBreakdown.push(...contentAnalysis.riskBreakdown);
+  warnings.push(...contentAnalysis.warnings);
+  checksPassed.push(...contentAnalysis.checksPassed);
 
   /* FILE NAME */
 
@@ -879,6 +916,10 @@ function analyzeFile(file) {
 
   if (sizeInMB > 25) {
     riskScore += 10;
+    riskBreakdown.push({
+      reason: "File is larger than 25 MB",
+      points: 10
+    });
 
     warnings.push(
       "File is larger than 25 MB"
@@ -916,6 +957,10 @@ function analyzeFile(file) {
     );
   } else {
     riskScore += 10;
+    riskBreakdown.push({
+      reason: "Unrecognized file extension",
+      points: 10
+    });
 
     warnings.push(
       `Unrecognized file extension: ${
@@ -986,6 +1031,10 @@ if (detectedType) {
     lowerName.startsWith(".")
   ) {
     riskScore += 10;
+    riskBreakdown.push({
+      reason: "Hidden file name",
+      points: 10
+    });
 
     warnings.push(
       "File name begins with a dot"
