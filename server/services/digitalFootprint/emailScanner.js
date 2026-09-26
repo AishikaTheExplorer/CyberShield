@@ -15,13 +15,12 @@ function analyzeEmail(email) {
   const cleanEmail = email.trim().toLowerCase();
 
   // Basic email format check
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (!emailPattern.test(cleanEmail)) {
-    result.warnings.push("Invalid email format.");
-    return result;
-  }
-
+if (!emailPattern.test(cleanEmail)) {
+  result.warnings.push("Invalid email format.");
+  return result;
+}
   result.valid = true;
 
   const domain = cleanEmail.split("@")[1];

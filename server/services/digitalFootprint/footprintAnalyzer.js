@@ -32,23 +32,42 @@ async function analyzeFootprint({
 
     if (cleanUsername.length < 4) {
       result.riskScore += 15;
+
       result.warnings.push(
         "Short usernames can be easier to guess or reuse."
       );
     }
 
-    result.usernameResults = await checkUsername(cleanUsername);
+    try {
+      result.usernameResults =
+        await checkUsername(cleanUsername);
 
-    const foundProfiles = result.usernameResults.filter(
-      (item) => item.found
-    );
+      const foundProfiles =
+        result.usernameResults.filter(
+          (item) => item.found
+        );
 
-    if (foundProfiles.length > 0) {
-      result.riskScore += Math.min(foundProfiles.length * 5, 25);
+      if (foundProfiles.length > 0) {
+        result.riskScore += Math.min(
+          foundProfiles.length * 5,
+          25
+        );
+
+        result.warnings.push(
+          `${foundProfiles.length} possible public profile(s) were found.`
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Username scanner error:",
+        error.message
+      );
 
       result.warnings.push(
-        `${foundProfiles.length} possible public profile(s) were found.`
+        "Some username platforms could not be checked."
       );
+
+      result.usernameResults = [];
     }
   }
 
@@ -61,7 +80,10 @@ async function analyzeFootprint({
 
     if (!result.emailResult.valid) {
       result.riskScore += 20;
-      result.warnings.push("The email address format appears invalid.");
+
+      result.warnings.push(
+        "The email address format appears invalid."
+      );
     }
 
     if (result.emailResult.type === "custom") {
@@ -69,7 +91,9 @@ async function analyzeFootprint({
     }
 
     if (result.emailResult.warnings.length > 0) {
-      result.warnings.push(...result.emailResult.warnings);
+      result.warnings.push(
+        ...result.emailResult.warnings
+      );
     }
   }
 
@@ -78,7 +102,8 @@ async function analyzeFootprint({
   // ==============================
 
   if (fullName.trim()) {
-    const nameParts = fullName.trim().split(/\s+/);
+    const nameParts =
+      fullName.trim().split(/\s+/);
 
     if (nameParts.length >= 2) {
       result.riskScore += 5;
@@ -94,7 +119,8 @@ async function analyzeFootprint({
   // ==============================
 
   if (phone.trim()) {
-    const phoneDigits = phone.replace(/\D/g, "");
+    const phoneDigits =
+      phone.replace(/\D/g, "");
 
     if (phoneDigits.length < 7) {
       result.riskScore += 20;
@@ -120,7 +146,9 @@ async function analyzeFootprint({
     email,
     fullName,
     phone,
-  ].filter((value) => value.trim()).length;
+  ].filter(
+    (value) => value.trim()
+  ).length;
 
   if (fieldsProvided >= 3) {
     result.riskScore += 15;
@@ -134,7 +162,8 @@ async function analyzeFootprint({
   // LIMIT SCORE
   // ==============================
 
-  result.riskScore = Math.min(result.riskScore, 100);
+  result.riskScore =
+    Math.min(result.riskScore, 100);
 
   // ==============================
   // RISK LEVEL
