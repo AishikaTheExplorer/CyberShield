@@ -1,4 +1,5 @@
-const checkUsername = require("./usernameScanner");
+```js
+const { scanUsername } = require("./usernameScanner");
 const analyzeEmail = require("./emailScanner");
 
 async function analyzeFootprint({
@@ -16,6 +17,7 @@ async function analyzeFootprint({
     },
 
     usernameResults: [],
+    usernameStatistics: null,
     emailResult: null,
 
     riskScore: 0,
@@ -23,12 +25,11 @@ async function analyzeFootprint({
     warnings: [],
   };
 
-  // ==============================
-  // USERNAME ANALYSIS
-  // ==============================
-
+  // Username analysis
   if (username.trim()) {
-    const cleanUsername = username.trim();
+    const cleanUsername = username
+      .trim()
+      .replace(/^@/, "");
 
     if (cleanUsername.length < 4) {
       result.riskScore += 15;
@@ -39,12 +40,19 @@ async function analyzeFootprint({
     }
 
     try {
+      const usernameResult =
+        await scanUsername(cleanUsername);
+
       result.usernameResults =
-        await checkUsername(cleanUsername);
+        usernameResult.profiles;
+
+      result.usernameStatistics =
+        usernameResult.statistics;
 
       const foundProfiles =
         result.usernameResults.filter(
-          (item) => item.found
+          (item) =>
+            item.statusType === "FOUND"
         );
 
       if (foundProfiles.length > 0) {
@@ -57,6 +65,23 @@ async function analyzeFootprint({
           `${foundProfiles.length} possible public profile(s) were found.`
         );
       }
+
+      if (
+        usernameResult.statistics.blocked > 0
+      ) {
+        result.warnings.push(
+          `${usernameResult.statistics.blocked} platform(s) blocked automated verification.`
+        );
+      }
+
+      if (
+        usernameResult.statistics.unknown > 0
+      ) {
+        result.warnings.push(
+          `${usernameResult.statistics.unknown} platform(s) could not be reliably verified.`
+        );
+      }
+
     } catch (error) {
       console.error(
         "Username scanner error:",
@@ -68,15 +93,14 @@ async function analyzeFootprint({
       );
 
       result.usernameResults = [];
+      result.usernameStatistics = null;
     }
   }
 
-  // ==============================
-  // EMAIL ANALYSIS
-  // ==============================
-
+  // Email analysis
   if (email.trim()) {
-    result.emailResult = analyzeEmail(email);
+    result.emailResult =
+      analyzeEmail(email.trim());
 
     if (!result.emailResult.valid) {
       result.riskScore += 20;
@@ -86,21 +110,22 @@ async function analyzeFootprint({
       );
     }
 
-    if (result.emailResult.type === "custom") {
+    if (
+      result.emailResult.type === "custom"
+    ) {
       result.riskScore += 5;
     }
 
-    if (result.emailResult.warnings.length > 0) {
+    if (
+      result.emailResult.warnings?.length > 0
+    ) {
       result.warnings.push(
         ...result.emailResult.warnings
       );
     }
   }
 
-  // ==============================
-  // FULL NAME ANALYSIS
-  // ==============================
-
+  // Full name analysis
   if (fullName.trim()) {
     const nameParts =
       fullName.trim().split(/\s+/);
@@ -114,10 +139,7 @@ async function analyzeFootprint({
     }
   }
 
-  // ==============================
-  // PHONE ANALYSIS
-  // ==============================
-
+  // Phone analysis
   if (phone.trim()) {
     const phoneDigits =
       phone.replace(/\D/g, "");
@@ -137,17 +159,16 @@ async function analyzeFootprint({
     }
   }
 
-  // ==============================
-  // MULTIPLE INFORMATION TYPES
-  // ==============================
-
+  // Multiple information types
   const fieldsProvided = [
     username,
     email,
     fullName,
     phone,
   ].filter(
-    (value) => value.trim()
+    (value) =>
+      typeof value === "string" &&
+      value.trim()
   ).length;
 
   if (fieldsProvided >= 3) {
@@ -158,17 +179,11 @@ async function analyzeFootprint({
     );
   }
 
-  // ==============================
-  // LIMIT SCORE
-  // ==============================
-
+  // Limit score
   result.riskScore =
     Math.min(result.riskScore, 100);
 
-  // ==============================
-  // RISK LEVEL
-  // ==============================
-
+  // Risk level
   if (result.riskScore >= 60) {
     result.riskLevel = "HIGH";
   } else if (result.riskScore >= 30) {
@@ -181,3 +196,4 @@ async function analyzeFootprint({
 }
 
 module.exports = analyzeFootprint;
+```
