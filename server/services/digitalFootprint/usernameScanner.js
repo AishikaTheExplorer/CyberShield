@@ -150,36 +150,68 @@ async function scanUsername(username) {
       )
   );
 
-  const results = await Promise.all(
+  const directResults = await Promise.all(
     sources.map((source) =>
-      checkSinglePlatform(source, cleanUsername)
+      checkSinglePlatform(
+        source,
+        cleanUsername
+      )
     )
   );
 
+  const finalResults = await Promise.all(
+    directResults.map(async (result) => {
+      if (
+        result.statusType !== "BLOCKED" &&
+        result.statusType !== "UNKNOWN"
+      ) {
+        return result;
+      }
+
+      const fallback =
+        await runFallback(
+          result.platform,
+          cleanUsername
+        );
+
+      return fallback || result;
+    })
+  );
+
   const statistics = {
-    checked: results.length,
-    found: results.filter(
-      (result) => result.statusType === "FOUND"
+    checked: finalResults.length,
+
+    found: finalResults.filter(
+      (result) =>
+        result.statusType === "FOUND"
     ).length,
-    notFound: results.filter(
-      (result) => result.statusType === "NOT_FOUND"
+
+    notFound: finalResults.filter(
+      (result) =>
+        result.statusType === "NOT_FOUND"
     ).length,
-    blocked: results.filter(
-      (result) => result.statusType === "BLOCKED"
+
+    blocked: finalResults.filter(
+      (result) =>
+        result.statusType === "BLOCKED"
     ).length,
-    unknown: results.filter(
-      (result) => result.statusType === "UNKNOWN"
+
+    unknown: finalResults.filter(
+      (result) =>
+        result.statusType === "UNKNOWN"
     ).length,
   };
 
   const verified =
-    statistics.found + statistics.notFound;
+    statistics.found +
+    statistics.notFound;
 
   const verificationRate =
     statistics.checked > 0
       ? Number(
           (
-            (verified / statistics.checked) *
+            (verified /
+              statistics.checked) *
             100
           ).toFixed(1)
         )
@@ -187,14 +219,18 @@ async function scanUsername(username) {
 
   return {
     success: true,
+
     username: cleanUsername,
-    profiles: results,
+
+    profiles: finalResults,
+
     statistics: {
       ...statistics,
       verificationRate,
     },
+
     note:
-      "A FOUND result means the profile URL was accessible. " +
+      "FOUND indicates that a public profile was detected. " +
       "It does not independently verify account ownership.",
   };
 }
