@@ -334,11 +334,11 @@ function App() {
 
     try {
 
-      const response =
-        await axios.post(
-          "https://cybershield-zdsb.onrender.com/api/digital-footprint",
-          footprintData
-        );
+     const response =
+  await axios.post(
+    "https://cybershield-zdsb.onrender.com/api/digital-footprint",
+    footprintData
+  );
 
 
       setFootprintResult({
@@ -388,10 +388,10 @@ function App() {
     try {
 
       const response =
-        await axios.get(
-         "https://cybershield-zdsb.onrender.com/"
+        await axios.post(
+          "https://cybershield-zdsb.onrender.com/api/digital-footprint",
+          footprintData
         );
-
 
       setBackendStatus(
         response.data.message
@@ -430,7 +430,7 @@ function App() {
       </header>
 
 
-      <main className="main-content">
+      <div className="main-content">
 
         <h2>
           Security Tools
@@ -702,12 +702,12 @@ function App() {
                   <span
                     className={
                       fileResult.analysis.riskLevel ===
-                      "HIGH"
+                        "HIGH"
                         ? "risk-high"
                         : fileResult.analysis.riskLevel ===
                           "MEDIUM"
-                        ? "risk-medium"
-                        : "risk-low"
+                          ? "risk-medium"
+                          : "risk-low"
                     }
                   >
 
@@ -723,29 +723,29 @@ function App() {
                 {fileResult.analysis.checksPassed
                   ?.length > 0 && (
 
-                  <div className="analysis-section">
+                    <div className="analysis-section">
 
-                    <h3>
-                      ✅ Checks Passed
-                    </h3>
+                      <h3>
+                        ✅ Checks Passed
+                      </h3>
 
-                    <ul>
+                      <ul>
 
-                      {fileResult.analysis.checksPassed.map(
-                        (check, index) => (
+                        {fileResult.analysis.checksPassed.map(
+                          (check, index) => (
 
-                          <li key={index}>
-                            {check}
-                          </li>
+                            <li key={index}>
+                              {check}
+                            </li>
 
-                        )
-                      )}
+                          )
+                        )}
 
-                    </ul>
+                      </ul>
 
-                  </div>
+                    </div>
 
-                )}
+                  )}
 
 
                 {/* WARNINGS */}
@@ -753,29 +753,29 @@ function App() {
                 {fileResult.analysis.warnings
                   ?.length > 0 && (
 
-                  <div className="analysis-section">
+                    <div className="analysis-section">
 
-                    <h3>
-                      ⚠️ Warnings
-                    </h3>
+                      <h3>
+                        ⚠️ Warnings
+                      </h3>
 
-                    <ul>
+                      <ul>
 
-                      {fileResult.analysis.warnings.map(
-                        (warning, index) => (
+                        {fileResult.analysis.warnings.map(
+                          (warning, index) => (
 
-                          <li key={index}>
-                            {warning}
-                          </li>
+                            <li key={index}>
+                              {warning}
+                            </li>
 
-                        )
-                      )}
+                          )
+                        )}
 
-                    </ul>
+                      </ul>
 
-                  </div>
+                    </div>
 
-                )}
+                  )}
 
 
                 {/* ASSESSMENT */}
@@ -787,12 +787,12 @@ function App() {
                   </strong>{" "}
 
                   {fileResult.analysis.riskLevel ===
-                  "HIGH"
+                    "HIGH"
                     ? "The file contains significant risk indicators."
                     : fileResult.analysis.riskLevel ===
                       "MEDIUM"
-                    ? "The file contains some characteristics that require caution."
-                    : "No major suspicious characteristics were detected by the current checks."}
+                      ? "The file contains some characteristics that require caution."
+                      : "No major suspicious characteristics were detected by the current checks."}
 
                 </p>
 
@@ -822,91 +822,91 @@ function App() {
                     {fileResult.threatIntel.available &&
                       !fileResult.threatIntel.reportFound && (
 
-                      <>
+                        <>
 
-                        <p>
-                          {fileResult.threatIntel.message}
-                        </p>
+                          <p>
+                            {fileResult.threatIntel.message}
+                          </p>
 
 
-                        <p className="vt-result">
+                          <p className="vt-result">
 
-                          <strong>
-                            Note:
-                          </strong>{" "}
+                            <strong>
+                              Note:
+                            </strong>{" "}
 
-                          No existing report does not mean
-                          that the file is guaranteed to be safe.
+                            No existing report does not mean
+                            that the file is guaranteed to be safe.
 
-                        </p>
+                          </p>
 
-                      </>
+                        </>
 
-                    )}
+                      )}
 
 
                     {fileResult.threatIntel.available &&
                       fileResult.threatIntel.reportFound && (
 
-                      <>
+                        <>
 
-                        <p>
+                          <p>
 
-                          <strong>
-                            🔴 Malicious:
-                          </strong>{" "}
+                            <strong>
+                              🔴 Malicious:
+                            </strong>{" "}
 
-                          {fileResult.threatIntel.malicious}
+                            {fileResult.threatIntel.malicious}
 
-                        </p>
-
-
-                        <p>
-
-                          <strong>
-                            🟠 Suspicious:
-                          </strong>{" "}
-
-                          {fileResult.threatIntel.suspicious}
-
-                        </p>
+                          </p>
 
 
-                        <p>
+                          <p>
 
-                          <strong>
-                            🟢 Harmless:
-                          </strong>{" "}
+                            <strong>
+                              🟠 Suspicious:
+                            </strong>{" "}
 
-                          {fileResult.threatIntel.harmless}
+                            {fileResult.threatIntel.suspicious}
 
-                        </p>
-
-
-                        <p>
-
-                          <strong>
-                            ⚪ Undetected:
-                          </strong>{" "}
-
-                          {fileResult.threatIntel.undetected}
-
-                        </p>
+                          </p>
 
 
-                        <p className="vt-result">
+                          <p>
 
-                          <strong>
-                            Result:
-                          </strong>{" "}
+                            <strong>
+                              🟢 Harmless:
+                            </strong>{" "}
 
-                          {fileResult.threatIntel.message}
+                            {fileResult.threatIntel.harmless}
 
-                        </p>
+                          </p>
 
-                      </>
 
-                    )}
+                          <p>
+
+                            <strong>
+                              ⚪ Undetected:
+                            </strong>{" "}
+
+                            {fileResult.threatIntel.undetected}
+
+                          </p>
+
+
+                          <p className="vt-result">
+
+                            <strong>
+                              Result:
+                            </strong>{" "}
+
+                            {fileResult.threatIntel.message}
+
+                          </p>
+
+                        </>
+
+                      )}
 
                   </div>
 
@@ -1018,245 +1018,245 @@ function App() {
             {urlResult.status === "success" &&
               !urlResult.loading && (
 
-              <div className="result-box">
+                <div className="result-box">
 
-                <h2>
-                  🔎 Security Analysis
-                </h2>
-
-
-                <p>
-
-                  <strong>
-                    URL:
-                  </strong>{" "}
-
-                  {urlResult.url}
-
-                </p>
+                  <h2>
+                    🔎 Security Analysis
+                  </h2>
 
 
-                <p>
+                  <p>
 
-                  <strong>
-                    Risk Score:
-                  </strong>{" "}
+                    <strong>
+                      URL:
+                    </strong>{" "}
 
-                  {urlResult.riskScore}/100
+                    {urlResult.url}
 
-                </p>
-
-
-                <p>
-
-                  <strong>
-                    Risk Level:
-                  </strong>{" "}
-
-                  <span
-                    className={
-                      urlResult.riskLevel === "HIGH"
-                        ? "risk-high"
-                        : urlResult.riskLevel === "MEDIUM"
-                        ? "risk-medium"
-                        : "risk-low"
-                    }
-                  >
-
-                    {urlResult.riskLevel}
-
-                  </span>
-
-                </p>
+                  </p>
 
 
-                {urlResult.positiveChecks
-                  ?.length > 0 && (
+                  <p>
 
-                  <div className="analysis-section">
+                    <strong>
+                      Risk Score:
+                    </strong>{" "}
 
-                    <h3>
-                      ✅ Checks Passed
-                    </h3>
+                    {urlResult.riskScore}/100
 
-                    <ul>
-
-                      {urlResult.positiveChecks.map(
-                        (check, index) => (
-
-                          <li key={index}>
-                            {check}
-                          </li>
-
-                        )
-                      )}
-
-                    </ul>
-
-                  </div>
-
-                )}
+                  </p>
 
 
-                {urlResult.warnings
-                  ?.length > 0 && (
+                  <p>
 
-                  <div className="analysis-section">
+                    <strong>
+                      Risk Level:
+                    </strong>{" "}
 
-                    <h3>
-                      ⚠️ Warnings
-                    </h3>
+                    <span
+                      className={
+                        urlResult.riskLevel === "HIGH"
+                          ? "risk-high"
+                          : urlResult.riskLevel === "MEDIUM"
+                            ? "risk-medium"
+                            : "risk-low"
+                      }
+                    >
 
-                    <ul>
+                      {urlResult.riskLevel}
 
-                      {urlResult.warnings.map(
-                        (warning, index) => (
+                    </span>
 
-                          <li key={index}>
-                            {warning}
-                          </li>
-
-                        )
-                      )}
-
-                    </ul>
-
-                  </div>
-
-                )}
+                  </p>
 
 
-                <p className="assessment">
+                  {urlResult.positiveChecks
+                    ?.length > 0 && (
 
-                  <strong>
-                    Assessment:
-                  </strong>{" "}
+                      <div className="analysis-section">
 
-                  {urlResult.message}
+                        <h3>
+                          ✅ Checks Passed
+                        </h3>
 
-                </p>
+                        <ul>
+
+                          {urlResult.positiveChecks.map(
+                            (check, index) => (
+
+                              <li key={index}>
+                                {check}
+                              </li>
+
+                            )
+                          )}
+
+                        </ul>
+
+                      </div>
+
+                    )}
 
 
-                {/* URL VIRUSTOTAL */}
+                  {urlResult.warnings
+                    ?.length > 0 && (
 
-                {urlResult.threatIntel && (
+                      <div className="analysis-section">
 
-                  <div className="threat-intel">
+                        <h3>
+                          ⚠️ Warnings
+                        </h3>
 
-                    <h2>
-                      🛡️ VirusTotal Threat Intelligence
-                    </h2>
+                        <ul>
+
+                          {urlResult.warnings.map(
+                            (warning, index) => (
+
+                              <li key={index}>
+                                {warning}
+                              </li>
+
+                            )
+                          )}
+
+                        </ul>
+
+                      </div>
+
+                    )}
 
 
-                    {urlResult.threatIntel.available &&
-                      urlResult.threatIntel.reportFound && (
+                  <p className="assessment">
 
-                      <>
+                    <strong>
+                      Assessment:
+                    </strong>{" "}
+
+                    {urlResult.message}
+
+                  </p>
+
+
+                  {/* URL VIRUSTOTAL */}
+
+                  {urlResult.threatIntel && (
+
+                    <div className="threat-intel">
+
+                      <h2>
+                        🛡️ VirusTotal Threat Intelligence
+                      </h2>
+
+
+                      {urlResult.threatIntel.available &&
+                        urlResult.threatIntel.reportFound && (
+
+                          <>
+
+                            <p>
+                              <strong>
+                                🔴 Malicious:
+                              </strong>{" "}
+
+                              {
+                                urlResult.threatIntel
+                                  .malicious
+                              }
+                            </p>
+
+
+                            <p>
+                              <strong>
+                                🟠 Suspicious:
+                              </strong>{" "}
+
+                              {
+                                urlResult.threatIntel
+                                  .suspicious
+                              }
+                            </p>
+
+
+                            <p>
+                              <strong>
+                                🟢 Harmless:
+                              </strong>{" "}
+
+                              {
+                                urlResult.threatIntel
+                                  .harmless
+                              }
+                            </p>
+
+
+                            <p>
+                              <strong>
+                                ⚪ Undetected:
+                              </strong>{" "}
+
+                              {
+                                urlResult.threatIntel
+                                  .undetected
+                              }
+                            </p>
+
+
+                            <p className="vt-result">
+
+                              <strong>
+                                Result:
+                              </strong>{" "}
+
+                              {
+                                urlResult.threatIntel
+                                  .message
+                              }
+
+                            </p>
+
+                          </>
+
+                        )}
+
+
+                      {urlResult.threatIntel.available &&
+                        !urlResult.threatIntel.reportFound && (
+
+                          <p>
+                            {
+                              urlResult.threatIntel
+                                .message
+                            }
+                          </p>
+
+                        )}
+
+
+                      {!urlResult.threatIntel.available && (
 
                         <p>
-                          <strong>
-                            🔴 Malicious:
-                          </strong>{" "}
-
-                          {
-                            urlResult.threatIntel
-                              .malicious
-                          }
-                        </p>
-
-
-                        <p>
-                          <strong>
-                            🟠 Suspicious:
-                          </strong>{" "}
-
-                          {
-                            urlResult.threatIntel
-                              .suspicious
-                          }
-                        </p>
-
-
-                        <p>
-                          <strong>
-                            🟢 Harmless:
-                          </strong>{" "}
-
-                          {
-                            urlResult.threatIntel
-                              .harmless
-                          }
-                        </p>
-
-
-                        <p>
-                          <strong>
-                            ⚪ Undetected:
-                          </strong>{" "}
-
-                          {
-                            urlResult.threatIntel
-                              .undetected
-                          }
-                        </p>
-
-
-                        <p className="vt-result">
-
-                          <strong>
-                            Result:
-                          </strong>{" "}
-
                           {
                             urlResult.threatIntel
                               .message
                           }
-
                         </p>
 
-                      </>
+                      )}
 
-                    )}
+                    </div>
 
-
-                    {urlResult.threatIntel.available &&
-                      !urlResult.threatIntel.reportFound && (
-
-                      <p>
-                        {
-                          urlResult.threatIntel
-                            .message
-                        }
-                      </p>
-
-                    )}
+                  )}
 
 
-                    {!urlResult.threatIntel.available && (
+                  <p className="disclaimer">
 
-                      <p>
-                        {
-                          urlResult.threatIntel
-                            .message
-                        }
-                      </p>
+                    {urlResult.disclaimer}
 
-                    )}
+                  </p>
 
-                  </div>
+                </div>
 
-                )}
-
-
-                <p className="disclaimer">
-
-                  {urlResult.disclaimer}
-
-                </p>
-
-              </div>
-
-            )}
+              )}
 
           </div>
 
@@ -1368,11 +1368,10 @@ function App() {
             <div className="privacy-note">
 
               🔒 <strong>Privacy:</strong>{" "}
-              Only enter information you are comfortable
-              analyzing. This version performs local
-              privacy-indicator analysis and does not
-              confirm whether your information appears
-              in a breach.
+              Your information is analyzed for basic
+              digital-exposure indicators. CyberShield
+              does not confirm data breaches or guarantee
+              that a profile belongs to you.
 
             </div>
 
@@ -1445,59 +1444,69 @@ function App() {
                   🔎 Digital Footprint Analysis
                 </h2>
 
-
                 <p>
-
                   <strong>
                     Risk Score:
                   </strong>{" "}
-
                   {footprintResult.analysis.riskScore}/100
-
                 </p>
 
-
                 <p>
-
                   <strong>
                     Risk Level:
                   </strong>{" "}
 
                   <span
                     className={
-                      footprintResult.analysis.riskLevel ===
-                      "HIGH"
+                      footprintResult.analysis.riskLevel === "HIGH"
                         ? "risk-high"
-                        : footprintResult.analysis.riskLevel ===
-                          "MEDIUM"
-                        ? "risk-medium"
-                        : "risk-low"
+                        : footprintResult.analysis.riskLevel === "MEDIUM"
+                          ? "risk-medium"
+                          : "risk-low"
                     }
                   >
-
                     {footprintResult.analysis.riskLevel}
-
                   </span>
-
                 </p>
 
 
-                {footprintResult.analysis.checksPassed
-                  ?.length > 0 && (
+                {/* USERNAME RESULTS */}
+
+                {footprintResult.analysis.usernameResults?.length > 0 && (
 
                   <div className="analysis-section">
 
                     <h3>
-                      ✅ Checks Passed
+                      👤 Username Exposure
                     </h3>
 
                     <ul>
 
-                      {footprintResult.analysis.checksPassed.map(
-                        (check, index) => (
+                      {footprintResult.analysis.usernameResults.map(
+                        (profile, index) => (
 
                           <li key={index}>
-                            {check}
+
+                            <strong>
+                              {profile.platform}
+                            </strong>
+                            {" — "}
+
+                            {profile.found ? (
+                              <>
+                                Profile may exist{" "}
+                                <a
+                                  href={profile.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View
+                                </a>
+                              </>
+                            ) : (
+                              "No accessible profile detected"
+                            )}
+
                           </li>
 
                         )
@@ -1510,8 +1519,52 @@ function App() {
                 )}
 
 
-                {footprintResult.analysis.warnings
-                  ?.length > 0 && (
+                {/* EMAIL RESULTS */}
+
+                {footprintResult.analysis.emailResult && (
+
+                  <div className="analysis-section">
+
+                    <h3>
+                      📧 Email Analysis
+                    </h3>
+
+                    <p>
+                      <strong>
+                        Valid:
+                      </strong>{" "}
+
+                      {footprintResult.analysis.emailResult.valid
+                        ? "Yes"
+                        : "No"}
+                    </p>
+
+                    <p>
+                      <strong>
+                        Provider:
+                      </strong>{" "}
+
+                      {footprintResult.analysis.emailResult.provider ||
+                        "Unknown"}
+                    </p>
+
+                    <p>
+                      <strong>
+                        Type:
+                      </strong>{" "}
+
+                      {footprintResult.analysis.emailResult.type ||
+                        "Unknown"}
+                    </p>
+
+                  </div>
+
+                )}
+
+
+                {/* WARNINGS */}
+
+                {footprintResult.analysis.warnings?.length > 0 && (
 
                   <div className="analysis-section">
 
@@ -1538,15 +1591,35 @@ function App() {
                 )}
 
 
-                <p className="assessment">
+                {/* INFORMATION */}
 
-                  <strong>
-                    Assessment:
-                  </strong>{" "}
+                <div className="analysis-section">
 
-                  {footprintResult.analysis.assessment}
+                  <h3>
+                    🔍 What This Scan Checks
+                  </h3>
 
-                </p>
+                  <ul>
+
+                    <li>
+                      Username profile availability on configured platforms
+                    </li>
+
+                    <li>
+                      Email format and domain type
+                    </li>
+
+                    <li>
+                      Basic personal-information exposure indicators
+                    </li>
+
+                    <li>
+                      Combined privacy risk score
+                    </li>
+
+                  </ul>
+
+                </div>
 
 
                 <p className="disclaimer">
@@ -1558,9 +1631,7 @@ function App() {
               </div>
 
             )}
-
           </div>
-
         )}
 
 
@@ -1588,10 +1659,10 @@ function App() {
 
         </div>
 
-      </main>
+      </div>
 
     </div>
   );
-}
+};
 
 export default App;
