@@ -8,53 +8,73 @@ async function checkSinglePlatform(source, username) {
   const timeout = setTimeout(() => {
     controller.abort();
   }, 3000);
+  let hardTimeout;
 
   try {
-    const response = await fetch(profileUrl, {
-      method: "GET",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36",
-        "Accept":
-          "text/html,application/xhtml+xml",
-      },
-    });
+    return await Promise.race([
+      (async () => {
+        const response = await fetch(profileUrl, {
+          method: "GET",
+          redirect: "follow",
+          signal: controller.signal,
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36",
+            "Accept":
+              "text/html,application/xhtml+xml",
+          },
+        });
 
-    let statusType = "unknown";
+        let statusType = "unknown";
 
-    if (response.status >= 200 && response.status < 300) {
-      statusType = "accessible";
-    } else if (response.status === 404) {
-      statusType = "not_found";
-    } else if (
-      response.status === 401 ||
-      response.status === 403 ||
-      response.status === 429
-    ) {
-      statusType = "blocked";
-    } else {
-      statusType = "unavailable";
-    }
+        if (response.status >= 200 && response.status < 300) {
+          statusType = "accessible";
+        } else if (response.status === 404) {
+          statusType = "not_found";
+        } else if (
+          response.status === 401 ||
+          response.status === 403 ||
+          response.status === 429
+        ) {
+          statusType = "blocked";
+        } else {
+          statusType = "unavailable";
+        }
 
-    return {
-      platform: source.name,
-      type: source.type,
-      username,
-      url: profileUrl,
-      status: response.status,
-      statusType,
-      found: statusType === "accessible",
-      message:
-        statusType === "accessible"
-          ? "Profile URL is accessible."
-          : statusType === "not_found"
-          ? "Profile was not found."
-          : statusType === "blocked"
-          ? "Platform did not allow automated verification."
-          : "Platform could not be verified.",
-    };
+        return {
+          platform: source.name,
+          type: source.type,
+          username,
+          url: profileUrl,
+          status: response.status,
+          statusType,
+          found: statusType === "accessible",
+          message:
+            statusType === "accessible"
+              ? "Profile URL is accessible."
+              : statusType === "not_found"
+              ? "Profile was not found."
+              : statusType === "blocked"
+              ? "Platform did not allow automated verification."
+              : "Platform could not be verified.",
+        };
+      })(),
+      new Promise((resolve) => {
+        hardTimeout = setTimeout(() => {
+          controller.abort();
+          resolve({
+            platform: source.name,
+            type: source.type,
+            username,
+            url: profileUrl,
+            status: null,
+            found: false,
+            statusType: "error",
+            message: "Platform check timed out.",
+          });
+        }, 4000);
+      }),
+    ]);
   } catch (error) {
     return {
       platform: source.name,
@@ -71,6 +91,7 @@ async function checkSinglePlatform(source, username) {
     };
   } finally {
     clearTimeout(timeout);
+    clearTimeout(hardTimeout);
   }
 }
 

@@ -334,7 +334,8 @@ function App() {
       const response =
         await axios.post(
           "https://cybershield-zdsb.onrender.com/api/digital-footprint",
-          footprintData
+          footprintData,
+          { timeout: 9000 }
         );
 
 
@@ -361,7 +362,9 @@ function App() {
         status: "error",
 
         message:
-          error.response?.data?.message ||
+          (error.code === "ECONNABORTED"
+            ? "Analysis took too long. Please try again."
+            : error.response?.data?.message) ||
           "Unable to analyze digital footprint."
       });
 
