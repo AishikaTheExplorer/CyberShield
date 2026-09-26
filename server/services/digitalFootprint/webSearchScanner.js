@@ -1,4 +1,4 @@
-```js
+
 const DuckDuckGoService = require("ddgs");
 
 const ddg = new DuckDuckGoService();
@@ -296,4 +296,4 @@ module.exports = {
   searchFullName,
   searchPhone,
 };
-```
+
