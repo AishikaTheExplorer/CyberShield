@@ -287,15 +287,12 @@ function App() {
     value
   ) => {
 
-    setFootprintData({
-
-      ...footprintData,
-
+    setFootprintData((previousData) => ({
+      ...previousData,
       [field]: value
-    });
+    }));
 
   };
-
 
   const checkFootprint = async () => {
 
@@ -1447,12 +1444,16 @@ function App() {
                   🔎 Digital Footprint Analysis
                 </h2>
 
+
+                {/* RISK SUMMARY */}
+
                 <p>
                   <strong>
                     Risk Score:
                   </strong>{" "}
                   {footprintResult.analysis.riskScore}/100
                 </p>
+
 
                 <p>
                   <strong>
@@ -1473,107 +1474,226 @@ function App() {
                 </p>
 
 
-                {/* USERNAME RESULTS */}
+                {/* =================================================
+        USERNAME EXPOSURE
+    ================================================= */}
 
-                {footprintResult.analysis.usernameResults?.length > 0 && (
+                <div className="analysis-section">
 
-                  <div className="analysis-section">
+                  <h3>
+                    👤 Username Exposure
+                  </h3>
 
-                    <h3>
-                      👤 Username Exposure
-                    </h3>
+                  {footprintData.username.trim() ? (
 
-                    <ul>
+                    footprintResult.analysis.usernameResults?.length > 0 ? (
 
-                      {footprintResult.analysis.usernameResults.map(
-                        (profile, index) => (
+                      <ul>
 
-                          <li key={index}>
+                        {footprintResult.analysis.usernameResults.map(
+                          (profile, index) => (
 
-                            <strong>
-                              {profile.platform}
-                            </strong>
-                            {" — "}
+                            <li key={index}>
 
-                            {profile.found ? (
-                              <>
-                                Profile may exist{" "}
-                                <a
-                                  href={profile.url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  View
-                                </a>
-                              </>
-                            ) : (
-                              "No accessible profile detected"
-                            )}
+                              <strong>
+                                {profile.platform}
+                              </strong>
 
-                          </li>
+                              {" — "}
 
-                        )
-                      )}
+                              {profile.found ? (
 
-                    </ul>
+                                <>
+                                  Possible profile detected{" "}
 
-                  </div>
+                                  <a
+                                    href={profile.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    View
+                                  </a>
+                                </>
 
-                )}
+                              ) : (
 
+                                "No accessible profile detected"
 
-                {/* EMAIL RESULTS */}
+                              )}
 
-                {footprintResult.analysis.emailResult && (
+                            </li>
 
-                  <div className="analysis-section">
+                          )
+                        )}
 
-                    <h3>
-                      📧 Email Analysis
-                    </h3>
+                      </ul>
 
-                    <p>
-                      <strong>
-                        Valid:
-                      </strong>{" "}
+                    ) : (
 
-                      {footprintResult.analysis.emailResult.valid
-                        ? "Yes"
-                        : "No"}
-                    </p>
+                      <p>
+                        No configured platform results were returned.
+                      </p>
+
+                    )
+
+                  ) : (
 
                     <p>
-                      <strong>
-                        Provider:
-                      </strong>{" "}
-
-                      {footprintResult.analysis.emailResult.provider ||
-                        "Unknown"}
+                      No username was provided.
                     </p>
+
+                  )}
+
+                  <p className="disclaimer">
+
+                    Username results indicate possible public profile
+                    availability only. They do not confirm that a
+                    profile belongs to the person being checked.
+
+                  </p>
+
+                </div>
+
+
+                {/* =================================================
+        EMAIL ANALYSIS
+    ================================================= */}
+
+                <div className="analysis-section">
+
+                  <h3>
+                    📧 Email Analysis
+                  </h3>
+
+                  {footprintData.email.trim() ? (
+
+                    footprintResult.analysis.emailResult ? (
+
+                      <>
+
+                        <p>
+
+                          <strong>
+                            Valid:
+                          </strong>{" "}
+
+                          {footprintResult.analysis.emailResult.valid
+                            ? "Yes"
+                            : "No"}
+
+                        </p>
+
+
+                        <p>
+
+                          <strong>
+                            Provider:
+                          </strong>{" "}
+
+                          {footprintResult.analysis.emailResult.provider ||
+                            "Unknown"}
+
+                        </p>
+
+
+                        <p>
+
+                          <strong>
+                            Type:
+                          </strong>{" "}
+
+                          {footprintResult.analysis.emailResult.type ||
+                            "Unknown"}
+
+                        </p>
+
+
+                        {footprintResult.analysis.emailResult.warnings
+                          ?.length > 0 && (
+
+                            <ul>
+
+                              {footprintResult.analysis.emailResult.warnings.map(
+                                (warning, index) => (
+
+                                  <li key={index}>
+                                    {warning}
+                                  </li>
+
+                                )
+                              )}
+
+                            </ul>
+
+                          )}
+
+                      </>
+
+                    ) : (
+
+                      <p>
+                        Email analysis was not returned.
+                      </p>
+
+                    )
+
+                  ) : (
 
                     <p>
-                      <strong>
-                        Type:
-                      </strong>{" "}
-
-                      {footprintResult.analysis.emailResult.type ||
-                        "Unknown"}
+                      No email address was provided.
                     </p>
 
-                  </div>
+                  )}
 
-                )}
+                </div>
 
 
-                {/* WARNINGS */}
+                {/* =================================================
+        PERSONAL INFORMATION
+    ================================================= */}
 
-                {footprintResult.analysis.warnings?.length > 0 && (
+                <div className="analysis-section">
 
-                  <div className="analysis-section">
+                  <h3>
+                    👤 Personal Information
+                  </h3>
 
-                    <h3>
-                      ⚠️ Privacy Indicators
-                    </h3>
+                  <ul>
+
+                    <li>
+                      Full Name:{" "}
+                      <strong>
+                        {footprintData.fullName.trim()
+                          ? "Provided"
+                          : "Not provided"}
+                      </strong>
+                    </li>
+
+                    <li>
+                      Phone Number:{" "}
+                      <strong>
+                        {footprintData.phone.trim()
+                          ? "Provided"
+                          : "Not provided"}
+                      </strong>
+                    </li>
+
+                  </ul>
+
+                </div>
+
+
+                {/* =================================================
+        PRIVACY INDICATORS
+    ================================================= */}
+
+                <div className="analysis-section">
+
+                  <h3>
+                    ⚠️ Privacy Indicators
+                  </h3>
+
+                  {footprintResult.analysis.warnings?.length > 0 ? (
 
                     <ul>
 
@@ -1589,12 +1709,21 @@ function App() {
 
                     </ul>
 
-                  </div>
+                  ) : (
 
-                )}
+                    <p>
+                      No privacy indicators were detected by the
+                      current checks.
+                    </p>
+
+                  )}
+
+                </div>
 
 
-                {/* INFORMATION */}
+                {/* =================================================
+        WHAT THIS SCAN CHECKS
+    ================================================= */}
 
                 <div className="analysis-section">
 
@@ -1625,6 +1754,10 @@ function App() {
                 </div>
 
 
+                {/* =================================================
+        DISCLAIMER
+    ================================================= */}
+
                 <p className="disclaimer">
 
                   {footprintResult.disclaimer}
@@ -1634,9 +1767,10 @@ function App() {
               </div>
 
             )}
-          </div>
-        )}
 
+          </div>
+
+        )}
 
         {/* =================================================
             BACKEND TEST
@@ -1650,7 +1784,6 @@ function App() {
           >
             Test Backend Connection
           </button>
-
 
           {backendStatus && (
 
@@ -1666,6 +1799,6 @@ function App() {
 
     </div>
   );
-};
+}
 
 export default App;
