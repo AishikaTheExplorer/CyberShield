@@ -1,43 +1,59 @@
 const footprintSources = [
   {
     name: "GitHub",
-    type: "developer",
-    url: "https://github.com/",
+    category: "developer",
+    url: "https://github.com/{username}",
+    api: "github",
+    enabled: true,
   },
+
   {
     name: "Reddit",
-    type: "social",
-    url: "https://www.reddit.com/",
+    category: "social",
+    url: "https://www.reddit.com/user/{username}",
+    enabled: true,
   },
+
   {
     name: "Instagram",
-    type: "social",
-    url: "https://www.instagram.com/",
+    category: "social",
+    url: "https://www.instagram.com/{username}/",
+    enabled: true,
   },
+
   {
     name: "LinkedIn",
-    type: "professional",
-    url: "https://www.linkedin.com/",
+    category: "professional",
+    url: "https://www.linkedin.com/in/{username}/",
+    enabled: true,
   },
+
   {
     name: "YouTube",
-    type: "social",
-    url: "https://www.youtube.com/",
+    category: "social",
+    url: "https://www.youtube.com/@{username}",
+    enabled: true,
   },
+
   {
     name: "TikTok",
-    type: "social",
-    url: "https://www.tiktok.com/",
+    category: "social",
+    url: "https://www.tiktok.com/@{username}",
+    enabled: true,
   },
+
   {
     name: "Facebook",
-    type: "social",
-    url: "https://www.facebook.com/",
+    category: "social",
+    url: "https://www.facebook.com/{username}",
+    enabled: true,
   },
+
   {
     name: "X",
-    type: "social",
-    url: "https://x.com/",
+    category: "social",
+    url: "https://x.com/{username}",
+    enabled: true,
   },
 ];
 
