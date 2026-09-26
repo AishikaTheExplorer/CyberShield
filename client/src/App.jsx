@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import heroImage from "./assets/hero.png";
 import "./App.css";
 
 function App() {
@@ -421,119 +422,162 @@ function App() {
       ================================================= */}
 
       <header className="header">
+        <div className="header-inner">
+          <a className="brand" href="#home" aria-label="CyberShield home">
+            <span className="brand-mark" aria-hidden="true">CS</span>
+            <span className="brand-name">
+              CyberShield
+              <small>PERSONAL SECURITY</small>
+            </span>
+          </a>
 
-        <h1>
-          🛡️ CyberShield
-        </h1>
+          <nav className="header-links" aria-label="Main navigation">
+            <a href="#tools">Security tools</a>
+            <button type="button" onClick={openFootprintChecker}>Privacy scan</button>
+          </nav>
 
-        <p>
-          Your Personal Cybersecurity Protection Center
-        </p>
-
+          <div className="header-status">
+            <span className="status-dot" />
+            <span>Protection desk</span>
+          </div>
+        </div>
       </header>
 
 
-      <div className="main-content">
+      <main className="main-content" id="home">
+        <section className="hero-section" aria-labelledby="hero-title">
+          <div className="hero-copy">
+            <p className="eyebrow"><span>01</span> YOUR PERSONAL SECURITY DESK</p>
+            <h1 id="hero-title">See the signals.<br /><span>Stay one step ahead.</span></h1>
+            <p className="intro-text">
+              A clearer view of the links you open, files you download, and information you leave online.
+            </p>
+            <button className="hero-button" onClick={openFootprintChecker}>
+              Start a privacy scan <span aria-hidden="true">↗</span>
+            </button>
+            <div className="hero-footnote">
+              <span className="status-dot" />
+              <span>Checks run when you ask. No background monitoring.</span>
+            </div>
+          </div>
 
-        <h2>
-          Security Tools
-        </h2>
+          <div className="hero-visual">
+            <img src={heroImage} alt="Abstract digital security landscape" />
+            <div className="visual-index"><span>FIELD NOTE</span><strong>01 / 03</strong></div>
+            <div className="visual-caption">
+              <span className="visual-caption-mark" aria-hidden="true">+</span>
+              <span>Know what is exposed.<br /><strong>Choose what happens next.</strong></span>
+            </div>
+          </div>
+        </section>
 
-        <p className="intro-text">
-          Check downloads, URLs, and digital exposure
-          before they become security problems.
-        </p>
+        <section className="tool-section" id="tools" aria-labelledby="tools-title">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow"><span>TOOLS</span> THREE WAYS TO CHECK</p>
+              <h2 id="tools-title">Your security, at a glance.</h2>
+            </div>
+            <span className="tool-count">01—03</span>
+          </div>
 
 
-        {/* =================================================
+          {/* =================================================
             CARDS
         ================================================= */}
 
-        <div className="cards-container">
+          <div className="cards-container">
 
 
-          {/* FILE CARD */}
+            {/* FILE CARD */}
 
-          <div className="security-card">
+            <div className="security-card tool-file">
 
-            <div className="card-icon">
-              📥
+              <div className="card-icon">
+                01
+              </div>
+
+              <p className="tool-category">FILE INSPECTION</p>
+
+              <h3>
+                Safe Download Checker
+              </h3>
+
+              <p>
+                Analyze downloaded files for
+                suspicious characteristics before
+                opening them.
+              </p>
+
+              <button
+                className="check-button"
+                onClick={openFileChecker}
+              >
+                Check a file <span aria-hidden="true">↗</span>
+              </button>
+
             </div>
 
-            <h3>
-              Safe Download Checker
-            </h3>
 
-            <p>
-              Analyze downloaded files for
-              suspicious characteristics before
-              opening them.
-            </p>
+            {/* URL CARD */}
 
-            <button
-              className="check-button"
-              onClick={openFileChecker}
-            >
-              Check File
-            </button>
+            <div className="security-card tool-url">
+
+              <div className="card-icon">
+                02
+              </div>
+
+              <p className="tool-category">LINK INTELLIGENCE</p>
+
+              <h3>
+                URL Safety Checker
+              </h3>
+
+              <p>
+                Analyze a website URL for suspicious
+                patterns and security risks.
+              </p>
+
+              <button
+                className="check-button"
+                onClick={openURLChecker}
+              >
+                Inspect a link <span aria-hidden="true">↗</span>
+              </button>
+
+            </div>
+
+
+            {/* FOOTPRINT CARD */}
+
+            <div className="security-card tool-footprint">
+
+              <div className="card-icon">
+                03
+              </div>
+
+              <p className="tool-category">PRIVACY REVIEW</p>
+
+              <h3>
+                Digital Footprint Checker
+              </h3>
+
+              <p>
+                Check your public digital exposure
+                and identify potential privacy risks.
+              </p>
+
+              <button
+                className="check-button"
+                onClick={openFootprintChecker}
+              >
+                Review exposure <span aria-hidden="true">↗</span>
+              </button>
+
+            </div>
 
           </div>
 
-
-          {/* URL CARD */}
-
-          <div className="security-card">
-
-            <div className="card-icon">
-              🔗
-            </div>
-
-            <h3>
-              URL Safety Checker
-            </h3>
-
-            <p>
-              Analyze a website URL for suspicious
-              patterns and security risks.
-            </p>
-
-            <button
-              className="check-button"
-              onClick={openURLChecker}
-            >
-              Check URL
-            </button>
-
-          </div>
-
-
-          {/* FOOTPRINT CARD */}
-
-          <div className="security-card">
-
-            <div className="card-icon">
-              👤
-            </div>
-
-            <h3>
-              Digital Footprint Checker
-            </h3>
-
-            <p>
-              Check your public digital exposure
-              and identify potential privacy risks.
-            </p>
-
-            <button
-              className="check-button"
-              onClick={openFootprintChecker}
-            >
-              Check Footprint
-            </button>
-
-          </div>
-
-        </div>
+        </section>
 
 
         {/* =================================================
@@ -1802,7 +1846,7 @@ function App() {
 
         </div>
 
-      </div>
+      </main>
 
     </div>
   );
