@@ -7,7 +7,7 @@ async function checkSinglePlatform(source, username) {
 
   const timeout = setTimeout(() => {
     controller.abort();
-  }, 5000);
+  }, 3000);
 
   try {
     const response = await fetch(profileUrl, {
