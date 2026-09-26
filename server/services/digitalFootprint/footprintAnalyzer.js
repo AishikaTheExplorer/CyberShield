@@ -1,4 +1,4 @@
-```js
+
 const { scanUsername } = require("./usernameScanner");
 const analyzeEmail = require("./emailScanner");
 
@@ -199,4 +199,4 @@ async function analyzeFootprint({
 }
 
 module.exports = analyzeFootprint;
-```
+
