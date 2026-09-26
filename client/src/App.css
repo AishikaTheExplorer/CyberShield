@@ -1366,6 +1366,64 @@ body {
   background: #b68136;
 }
 
+.file-risk-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.file-risk-summary h3 {
+  margin: 0;
+  color: var(--ink);
+  font: 600 17px/1.3 var(--display);
+}
+
+.file-risk-indicator {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #568d65;
+}
+
+.file-risk-medium .file-risk-indicator {
+  background: #bc8738;
+}
+
+.file-risk-high .file-risk-indicator {
+  background: #bd5544;
+}
+
+.file-risk-message {
+  margin: 7px 0 3px !important;
+}
+
+.file-risk-breakdown {
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.file-risk-breakdown ul {
+  margin: 7px 0 0;
+  padding-left: 25px;
+}
+
+.file-risk-breakdown li {
+  margin-bottom: 5px;
+  color: var(--ink-soft);
+}
+
+.file-risk-breakdown li strong {
+  color: var(--ink);
+}
+
+.file-risk-level {
+  margin-top: 10px !important;
+}
+
 .analysis-section ul {
   padding-left: 19px;
 }

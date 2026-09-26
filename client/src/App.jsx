@@ -692,7 +692,7 @@ function App() {
               <div className="result-box">
 
                 <p className="result-kicker">INSPECTION REPORT</p>
-                <h2>File security analysis</h2>
+                <h2>File Security Analysis</h2>
 
 
                 <p>
@@ -724,6 +724,15 @@ function App() {
 
                 <p>
                   <strong>
+                    Detected Type:
+                  </strong>{" "}
+
+                  {fileResult.analysis.detectedType || "Unknown"}
+                </p>
+
+
+                <p>
+                  <strong>
                     SHA-256:
                   </strong>
                 </p>
@@ -736,36 +745,44 @@ function App() {
                 </p>
 
 
-                <p>
-                  <strong>
-                    Risk Score:
-                  </strong>{" "}
+                <div className={`file-risk-summary file-risk-${fileResult.analysis.riskLevel.toLowerCase()}`}>
+                  <span className="file-risk-indicator" aria-hidden="true" />
+                  <h3>{fileResult.analysis.riskLevel === "HIGH"
+                    ? "High Risk File"
+                    : fileResult.analysis.riskLevel === "MEDIUM"
+                      ? "Medium Risk File"
+                      : "Low Risk File"}</h3>
+                </div>
 
+                <p className="file-risk-message">
+                  {fileResult.analysis.riskBreakdown?.length > 0
+                    ? `${fileResult.analysis.riskBreakdown.length} risk indicator${fileResult.analysis.riskBreakdown.length === 1 ? "" : "s"} detected. Review the breakdown below.`
+                    : "No significant suspicious indicators were detected in this file."}
+                </p>
+
+                <p>
+                  <strong>Risk Score:</strong>{" "}
                   {fileResult.analysis.riskScore}/100
                 </p>
 
+                {fileResult.analysis.riskBreakdown?.length > 0 && (
+                  <div className="file-risk-breakdown">
+                    <strong>Risk Breakdown:</strong>
+                    <ul>
+                      {fileResult.analysis.riskBreakdown.map((finding, index) => (
+                        <li key={`${finding.reason}-${index}`}>
+                          <strong>+{finding.points}</strong> - {finding.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-                <p>
-                  <strong>
-                    Risk Level:
-                  </strong>{" "}
-
-                  <span
-                    className={
-                      fileResult.analysis.riskLevel ===
-                        "HIGH"
-                        ? "risk-high"
-                        : fileResult.analysis.riskLevel ===
-                          "MEDIUM"
-                          ? "risk-medium"
-                          : "risk-low"
-                    }
-                  >
-
+                <p className="file-risk-level">
+                  <strong>Risk Level:</strong>{" "}
+                  <span className={`risk-${fileResult.analysis.riskLevel.toLowerCase()}`}>
                     {fileResult.analysis.riskLevel}
-
                   </span>
-
                 </p>
 
 
@@ -776,7 +793,7 @@ function App() {
 
                     <div className="analysis-section">
 
-                      <h3 className="analysis-title analysis-title-passed">Checks passed</h3>
+                      <h3 className="analysis-title analysis-title-passed">Checks Passed</h3>
 
                       <ul>
 
@@ -785,32 +802,6 @@ function App() {
 
                             <li key={index}>
                               {check}
-                            </li>
-
-                          )
-                        )}
-
-                      </ul>
-
-                    </div>
-
-                  )}
-
-
-                {fileResult.analysis.riskBreakdown
-                  ?.length > 0 && (
-
-                    <div className="analysis-section">
-
-                      <h3 className="analysis-title analysis-title-warning">Risk score contributions</h3>
-
-                      <ul>
-
-                        {fileResult.analysis.riskBreakdown.map(
-                          (finding, index) => (
-
-                            <li key={`${finding.reason}-${index}`}>
-                              {finding.reason} (+{finding.points} points)
                             </li>
 
                           )
@@ -852,23 +843,6 @@ function App() {
 
 
                 {/* ASSESSMENT */}
-
-                <p className="assessment">
-
-                  <strong>
-                    Assessment:
-                  </strong>{" "}
-
-                  {fileResult.analysis.riskLevel ===
-                    "HIGH"
-                    ? "The file contains significant risk indicators."
-                    : fileResult.analysis.riskLevel ===
-                      "MEDIUM"
-                      ? "The file contains some characteristics that require caution."
-                      : "No major suspicious characteristics were detected by the current checks."}
-
-                </p>
-
 
                 {/* =================================================
                     VIRUSTOTAL FILE INTELLIGENCE
