@@ -1016,6 +1016,33 @@ body {
   object-position: center;
 }
 
+.visual-grid,
+.visual-scan-line {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.visual-grid {
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.32) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.32) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mix-blend-mode: screen;
+}
+
+.visual-scan-line {
+  top: 0;
+  bottom: 0;
+  left: 28%;
+  width: 1px;
+  background: var(--leaf);
+  box-shadow: 0 0 13px rgba(185, 215, 98, 0.9);
+  animation: scan-line 4.8s ease-in-out infinite alternate;
+}
+
 .visual-index,
 .visual-caption {
   position: absolute;
@@ -2015,6 +2042,18 @@ body {
 
   to {
     transform: translateX(190%);
+  }
+}
+
+@keyframes scan-line {
+  from {
+    opacity: 0.2;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0.85;
+    transform: translateX(230px);
   }
 }
 

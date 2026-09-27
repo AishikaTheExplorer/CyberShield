@@ -463,6 +463,8 @@ function App() {
 
           <div className="hero-visual">
             <img src={heroImage} alt="Abstract digital security landscape" />
+            <div className="visual-grid" aria-hidden="true" />
+            <div className="visual-scan-line" aria-hidden="true" />
             <div className="visual-coordinate" aria-hidden="true">
               <span>CS / 27.09</span>
               <i />
