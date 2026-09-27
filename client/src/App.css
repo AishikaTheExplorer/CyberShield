@@ -1651,6 +1651,12 @@ body {
   background: #f1f4ef;
 }
 
+.app-container[data-theme="dark"] .threat-intel .vt-result {
+  border-left: 2px solid var(--leaf);
+  background: rgba(180, 214, 195, 0.08);
+  color: var(--ink);
+}
+
 .vt-safe {
   color: #39714c;
 }
