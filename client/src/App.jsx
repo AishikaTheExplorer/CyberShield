@@ -336,7 +336,7 @@ function App() {
         await axios.post(
           "https://cybershield-zdsb.onrender.com/api/digital-footprint",
           footprintData,
-          { timeout: 9000 }
+          { timeout: 30000 }
         );
 
 
@@ -1572,17 +1572,20 @@ function App() {
 
                               {" — "}
 
-                              {profile.found ? (
+                              {profile.url ? (
 
                                 <>
-                                  Possible profile detected{" "}
+                                  {profile.found
+                                    ? "Possible profile detected"
+                                    : "No accessible profile detected"}
+                                  {" — "}
 
                                   <a
                                     href={profile.url}
                                     target="_blank"
                                     rel="noreferrer"
                                   >
-                                    View
+                                    View public link
                                   </a>
                                 </>
 

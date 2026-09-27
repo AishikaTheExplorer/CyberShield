@@ -148,12 +148,46 @@ async function scanUsername(username) {
       source.enabled !== false
   );
 
-  const finalResults = await Promise.all(
-    sources.map((source) =>
-      checkSinglePlatform(
-        source,
-        cleanUsername
-      )
+  const finalResults = await Promise.allSettled(
+    sources.map(async (source) => {
+      try {
+        return await checkSinglePlatform(
+          source,
+          cleanUsername
+        );
+      } catch (error) {
+        return {
+          platform: source.name,
+          type: source.category,
+          username: cleanUsername,
+          url: `${source.url}${encodeURIComponent(cleanUsername)}`,
+          status: null,
+          statusType: "UNKNOWN",
+          found: false,
+          confidence: 0,
+          method: "direct",
+          message:
+            "Platform could not be checked from the server.",
+        };
+      }
+    })
+  ).then((results) =>
+    results.map((result) =>
+      result.status === "fulfilled"
+        ? result.value
+        : {
+            platform: result.reason?.platform || "Unknown platform",
+            type: result.reason?.type || "unknown",
+            username: cleanUsername,
+            url: result.reason?.url || "",
+            status: null,
+            statusType: "UNKNOWN",
+            found: false,
+            confidence: 0,
+            method: "direct",
+            message:
+              "Platform could not be checked from the server.",
+          }
     )
   );
 
