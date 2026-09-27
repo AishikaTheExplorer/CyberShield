@@ -242,13 +242,7 @@ function App() {
       const response =
         await axios.post(
           "https://cybershield-zdsb.onrender.com/api/file-check",
-          formData,
-          {
-            headers: {
-              "Content-Type":
-                "multipart/form-data"
-            }
-          }
+          formData
         );
 
 
