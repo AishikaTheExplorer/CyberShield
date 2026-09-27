@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import heroImage from "./assets/hero-security.svg";
 import "./App.css";
@@ -49,6 +49,28 @@ function App() {
 
   const [backendStatus, setBackendStatus] =
     useState("");
+
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === "undefined") {
+      return "light";
+    }
+
+    const storedTheme = localStorage.getItem("cybershield-theme");
+
+    if (storedTheme === "dark" || storedTheme === "light") {
+      return storedTheme;
+    }
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cybershield-theme", theme);
+    }
+
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
 
   /* =================================================
@@ -434,6 +456,13 @@ function App() {
           <nav className="header-links" aria-label="Main navigation">
             <a href="#tools">Security tools</a>
             <button type="button" onClick={openFootprintChecker}>Privacy scan</button>
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setTheme((currentTheme) => currentTheme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? "Light mode" : "Dark mode"}
+            </button>
           </nav>
 
           <div className="header-status">

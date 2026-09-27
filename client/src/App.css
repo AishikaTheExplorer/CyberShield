@@ -801,10 +801,102 @@ body {
 }
 
 .app-container {
+  --ink: #18342e;
+  --ink-soft: #48615a;
+  --muted: #718079;
+  --paper: #f4f6f1;
+  --paper-deep: #e9eee8;
+  --line: #d8e0d8;
+  --forest: #15332d;
+  --leaf: #b9d762;
+  --cobalt: #315ae5;
+  --ember: #e9784e;
   min-height: 100vh;
   background:
     linear-gradient(90deg, transparent 0, transparent calc(50% - 1px), rgba(24, 52, 46, 0.035) 50%, transparent calc(50% + 1px)),
     var(--paper);
+  color: var(--ink);
+}
+
+.app-container[data-theme="dark"] {
+  --ink: #edf7ef;
+  --ink-soft: #d0dcd3;
+  --muted: #9fb1a3;
+  --paper: #0d1715;
+  --paper-deep: #121f1b;
+  --line: rgba(162, 182, 170, 0.18);
+  --forest: #0b1917;
+  --leaf: #b9d762;
+  --cobalt: #89a8ff;
+  --ember: #f4a77a;
+  background:
+    linear-gradient(90deg, transparent 0, transparent calc(50% - 1px), rgba(180, 214, 195, 0.05) 50%, transparent calc(50% + 1px)),
+    var(--paper);
+  color: var(--ink);
+}
+
+.app-container[data-theme="dark"] .main-content,
+.app-container[data-theme="dark"] .tool-section,
+.app-container[data-theme="dark"] .tool-workspace,
+.app-container[data-theme="dark"] .signal-rail,
+.app-container[data-theme="dark"] .security-card,
+.app-container[data-theme="dark"] .url-checker-panel,
+.app-container[data-theme="dark"] .result-box,
+.app-container[data-theme="dark"] .threat-intel,
+.app-container[data-theme="dark"] .file-input-container,
+.app-container[data-theme="dark"] .file-picker-label,
+.app-container[data-theme="dark"] .selected-file,
+.app-container[data-theme="dark"] .file-info-item,
+.app-container[data-theme="dark"] .hash,
+.app-container[data-theme="dark"] .privacy-note,
+.app-container[data-theme="dark"] .analysis-section {
+  color: var(--ink);
+}
+
+.app-container[data-theme="dark"] .security-card,
+.app-container[data-theme="dark"] .url-checker-panel,
+.app-container[data-theme="dark"] .result-box,
+.app-container[data-theme="dark"] .threat-intel,
+.app-container[data-theme="dark"] .file-info-item,
+.app-container[data-theme="dark"] .selected-file,
+.app-container[data-theme="dark"] .file-picker-label,
+.app-container[data-theme="dark"] .hash,
+.app-container[data-theme="dark"] .privacy-note {
+  background: rgba(18, 31, 27, 0.9);
+  border-color: var(--line);
+}
+
+.app-container[data-theme="dark"] .file-info-item strong,
+.app-container[data-theme="dark"] .result-box strong,
+.app-container[data-theme="dark"] .analysis-section h3,
+.app-container[data-theme="dark"] .result-box h2,
+.app-container[data-theme="dark"] .security-card h3,
+.app-container[data-theme="dark"] .url-checker-panel > h2,
+.app-container[data-theme="dark"] .tool-panel-heading h2 {
+  color: var(--ink);
+}
+
+.app-container[data-theme="dark"] .security-card p,
+.app-container[data-theme="dark"] .result-box p,
+.app-container[data-theme="dark"] .analysis-section li,
+.app-container[data-theme="dark"] .tool-panel-heading > div > p:last-child,
+.app-container[data-theme="dark"] .url-checker-panel > p,
+.app-container[data-theme="dark"] .file-picker-copy > span,
+.app-container[data-theme="dark"] .selected-file,
+.app-container[data-theme="dark"] .privacy-note {
+  color: var(--ink-soft);
+}
+
+.app-container[data-theme="dark"] .footprint-input,
+.app-container[data-theme="dark"] .url-input-container input {
+  background: #0f1715 !important;
+  border-color: var(--line);
+  color: var(--ink) !important;
+}
+
+.app-container[data-theme="dark"] .footprint-input::placeholder,
+.app-container[data-theme="dark"] .url-input-container input::placeholder {
+  color: var(--muted) !important;
 }
 
 .header {
@@ -871,6 +963,15 @@ body {
   font-size: 13px;
   text-decoration: none;
   cursor: pointer;
+}
+
+.theme-toggle {
+  padding: 8px 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #edf7ef;
+  font: 500 12px var(--display);
 }
 
 .header-links a:hover,
