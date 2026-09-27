@@ -1039,6 +1039,27 @@ body {
   font-weight: 500;
 }
 
+.visual-coordinate {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 17px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: rgba(255, 255, 255, 0.76);
+  font: 400 8px var(--mono);
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+}
+
+.visual-coordinate i {
+  display: block;
+  width: 1px;
+  height: 43px;
+  background: var(--leaf);
+}
+
 .visual-caption {
   right: 22px;
   bottom: 21px;
@@ -1698,6 +1719,10 @@ body {
   .visual-index {
     top: 12px;
     right: 12px;
+  }
+
+  .visual-coordinate {
+    left: 11px;
   }
 
   .visual-caption {

@@ -463,6 +463,11 @@ function App() {
 
           <div className="hero-visual">
             <img src={heroImage} alt="Abstract digital security landscape" />
+            <div className="visual-coordinate" aria-hidden="true">
+              <span>CS / 27.09</span>
+              <i />
+              <span>SCAN READY</span>
+            </div>
             <div className="visual-index"><span>FIELD NOTE</span><strong>01 / 03</strong></div>
             <div className="visual-caption">
               <span className="visual-caption-mark" aria-hidden="true">+</span>
