@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import heroImage from "./assets/hero.png";
+import heroImage from "./assets/hero-security.svg";
 import "./App.css";
 
 function App() {
