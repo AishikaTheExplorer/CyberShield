@@ -2067,6 +2067,11 @@ body {
   font-weight: 600;
 }
 
+.app-container[data-theme="dark"] .file-picker-action {
+  background: var(--forest);
+  color: var(--ink);
+}
+
 .file-picker-input {
   position: absolute;
   inset: 0;
