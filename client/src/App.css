@@ -2045,3 +2045,142 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Field-note signal rail */
+.signal-rail {
+  display: grid;
+  grid-template-columns: 1.35fr repeat(3, 1fr);
+  border-bottom: 1px solid var(--line);
+  background: rgba(233, 238, 232, 0.58);
+}
+
+.signal-rail-intro,
+.signal-item {
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  gap: 12px;
+  padding: 17px 20px;
+  border-right: 1px solid var(--line);
+  color: var(--muted);
+  font: 500 9px/1.5 var(--mono);
+}
+
+.signal-rail-intro {
+  color: var(--ink-soft);
+}
+
+.signal-rail-intro strong,
+.signal-item strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.signal-rail-mark {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--ember);
+  color: var(--ember);
+  font-size: 17px;
+}
+
+.signal-item {
+  gap: 15px;
+}
+
+.signal-item:last-child {
+  border-right: 0;
+}
+
+.signal-value {
+  color: var(--cobalt);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.signal-item small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font: 400 10px var(--display);
+}
+
+.signal-item:nth-child(3) .signal-value {
+  color: var(--ember);
+}
+
+.signal-item:nth-child(4) .signal-value {
+  color: #86a93c;
+}
+
+.hero-visual {
+  border: 1px solid rgba(21, 51, 45, 0.18);
+  box-shadow: 16px 16px 0 rgba(185, 215, 98, 0.22);
+}
+
+.hero-visual::before {
+  position: absolute;
+  z-index: 1;
+  inset: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  content: '';
+  pointer-events: none;
+}
+
+.security-card:nth-child(2) {
+  transform: translateY(13px);
+}
+
+.security-card:nth-child(2):hover {
+  transform: translateY(10px);
+}
+
+@media (max-width: 800px) {
+  .signal-rail {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .signal-rail-intro {
+    grid-column: 1 / -1;
+    min-height: 58px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .signal-item {
+    min-height: 76px;
+  }
+}
+
+@media (max-width: 600px) {
+  .signal-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-rail-intro,
+  .signal-item {
+    min-height: 63px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .signal-item:last-child {
+    border-bottom: 0;
+  }
+
+  .hero-visual {
+    box-shadow: 8px 8px 0 rgba(185, 215, 98, 0.22);
+  }
+
+  .hero-visual::before {
+    inset: 11px;
+  }
+
+  .security-card:nth-child(2) {
+    transform: none;
+  }
+}

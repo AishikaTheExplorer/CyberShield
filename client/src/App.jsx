@@ -471,6 +471,25 @@ function App() {
           </div>
         </section>
 
+        <section className="signal-rail" aria-label="CyberShield coverage summary">
+          <div className="signal-rail-intro">
+            <span className="signal-rail-mark" aria-hidden="true">+</span>
+            <span>YOUR EXPOSURE<br /><strong>IN THREE SIGNALS</strong></span>
+          </div>
+          <div className="signal-item">
+            <span className="signal-value">01</span>
+            <span><strong>OPEN</strong><small>Links before you click</small></span>
+          </div>
+          <div className="signal-item">
+            <span className="signal-value">02</span>
+            <span><strong>LOCAL</strong><small>Files before they run</small></span>
+          </div>
+          <div className="signal-item">
+            <span className="signal-value">03</span>
+            <span><strong>PUBLIC</strong><small>Footprints you leave</small></span>
+          </div>
+        </section>
+
         <section className="tool-section" id="tools" aria-labelledby="tools-title">
           <div className="section-heading">
             <div>
