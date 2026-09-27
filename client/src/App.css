@@ -801,6 +801,7 @@ body {
 }
 
 .app-container {
+  color-scheme: light;
   --ink: #18342e;
   --ink-soft: #48615a;
   --muted: #718079;
@@ -819,6 +820,7 @@ body {
 }
 
 .app-container[data-theme="dark"] {
+  color-scheme: dark;
   --ink: #edf7ef;
   --ink-soft: #d0dcd3;
   --muted: #9fb1a3;

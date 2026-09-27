@@ -436,7 +436,7 @@ function App() {
 
   return (
 
-    <div className="app-container">
+    <div className="app-container" data-theme={theme}>
 
 
       {/* =================================================
