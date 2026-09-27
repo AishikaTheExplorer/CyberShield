@@ -1,12 +1,3 @@
-const {
-  scanWeb,
-} = require("./webSearchScanner");
-
-const {
-  extractAllEvidence,
-  summarizeEvidence,
-} = require("./evidenceExtractor");
-
 const { scanUsername } = require("./usernameScanner");
 const analyzeEmail = require("./emailScanner");
 
@@ -29,24 +20,27 @@ async function analyzeFootprint({
     emailResult: null,
 
     webResults: [],
-publicEvidence: [],
-evidenceSummary: {
-  totalSources: 0,
-  usernameMentions: 0,
-  emailMentions: 0,
-  phoneMentions: 0,
-  nameMentions: 0,
-  highImpact: 0,
-  mediumImpact: 0,
-  lowImpact: 0,
-},
-    
+    publicEvidence: [],
+
+    evidenceSummary: {
+      totalSources: 0,
+      usernameMentions: 0,
+      emailMentions: 0,
+      phoneMentions: 0,
+      nameMentions: 0,
+      highImpact: 0,
+      mediumImpact: 0,
+      lowImpact: 0,
+    },
+
     riskScore: 0,
     riskLevel: "LOW",
     warnings: [],
   };
 
+  // -----------------------------
   // Username analysis
+  // -----------------------------
   if (username.trim()) {
     const cleanUsername = username
       .trim()
@@ -65,10 +59,10 @@ evidenceSummary: {
         await scanUsername(cleanUsername);
 
       result.usernameResults =
-        usernameResult.profiles;
+        usernameResult.profiles || [];
 
       result.usernameStatistics =
-        usernameResult.statistics;
+        usernameResult.statistics || null;
 
       const foundProfiles =
         result.usernameResults.filter(
@@ -82,30 +76,31 @@ evidenceSummary: {
           25
         );
 
-         result.warnings.push(
-  foundProfiles.length +
-    " possible public profile(s) were found."
-);
+        result.warnings.push(
+          foundProfiles.length +
+            " possible public profile(s) were found."
+        );
       }
 
       if (
+        usernameResult.statistics &&
         usernameResult.statistics.blocked > 0
       ) {
         result.warnings.push(
-  usernameResult.statistics.blocked +
-    " platform(s) blocked automated verification."
-);
+          usernameResult.statistics.blocked +
+            " platform(s) blocked automated verification."
+        );
       }
 
       if (
+        usernameResult.statistics &&
         usernameResult.statistics.unknown > 0
       ) {
         result.warnings.push(
-  usernameResult.statistics.unknown +
-    " platform(s) could not be reliably verified."
-);
+          usernameResult.statistics.unknown +
+            " platform(s) could not be reliably verified."
+        );
       }
-
     } catch (error) {
       console.error(
         "Username scanner error:",
@@ -121,7 +116,9 @@ evidenceSummary: {
     }
   }
 
+  // -----------------------------
   // Email analysis
+  // -----------------------------
   if (email.trim()) {
     result.emailResult =
       analyzeEmail(email.trim());
@@ -149,7 +146,9 @@ evidenceSummary: {
     }
   }
 
+  // -----------------------------
   // Full name analysis
+  // -----------------------------
   if (fullName.trim()) {
     const nameParts =
       fullName.trim().split(/\s+/);
@@ -163,7 +162,9 @@ evidenceSummary: {
     }
   }
 
+  // -----------------------------
   // Phone analysis
+  // -----------------------------
   if (phone.trim()) {
     const phoneDigits =
       phone.replace(/\D/g, "");
@@ -183,7 +184,9 @@ evidenceSummary: {
     }
   }
 
+  // -----------------------------
   // Multiple information types
+  // -----------------------------
   const fieldsProvided = [
     username,
     email,
@@ -202,36 +205,16 @@ evidenceSummary: {
       "Multiple personal information fields were provided."
     );
   }
-const webResult = await scanWeb({
-  username,
-  email,
-  fullName,
-  phone,
-});
 
-const evidence =
-  extractAllEvidence(
-    webResult.results,
-    {
-      username,
-      email,
-      fullName,
-      phone,
-    }
-  );
-
-result.webResults = webResult.results;
-
-result.publicEvidence = evidence;
-
-result.evidenceSummary =
-  summarizeEvidence(evidence);
-  
-  // Limit score
+  // -----------------------------
+  // Risk score
+  // -----------------------------
   result.riskScore =
     Math.min(result.riskScore, 100);
 
+  // -----------------------------
   // Risk level
+  // -----------------------------
   if (result.riskScore >= 60) {
     result.riskLevel = "HIGH";
   } else if (result.riskScore >= 30) {
@@ -244,4 +227,3 @@ result.evidenceSummary =
 }
 
 module.exports = analyzeFootprint;
-

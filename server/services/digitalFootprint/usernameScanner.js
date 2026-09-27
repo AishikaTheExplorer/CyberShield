@@ -1,11 +1,11 @@
-
 const footprintSources = require("./footprintSources");
 
 const REQUEST_TIMEOUT = 3000;
 const HARD_TIMEOUT = 4000;
 
 async function checkSinglePlatform(source, username) {
-  const profileUrl = `${source.url}${encodeURIComponent(username)}`;
+  const profileUrl =
+    `${source.url}${encodeURIComponent(username)}`;
 
   const controller = new AbortController();
 
@@ -14,7 +14,7 @@ async function checkSinglePlatform(source, username) {
 
   const baseResult = {
     platform: source.name,
-    type: source.type,
+    type: source.category,
     username,
     url: profileUrl,
   };
@@ -50,7 +50,7 @@ async function checkSinglePlatform(source, username) {
         ) {
           statusType = "FOUND";
           found = true;
-          confidence = 0.70;
+          confidence = 0.7;
         } else if (response.status === 404) {
           statusType = "NOT_FOUND";
           confidence = 0.85;
@@ -124,7 +124,8 @@ async function scanUsername(username) {
   ) {
     return {
       success: false,
-      error: "Username must contain at least 2 characters.",
+      error:
+        "Username must contain at least 2 characters.",
       username: username || "",
       profiles: [],
       statistics: {
@@ -144,38 +145,16 @@ async function scanUsername(username) {
   const sources = footprintSources.filter(
     (source) =>
       source &&
-      (
-        source.enabled === undefined ||
-        source.enabled === true
-      )
+      source.enabled !== false
   );
 
-  const directResults = await Promise.all(
+  const finalResults = await Promise.all(
     sources.map((source) =>
       checkSinglePlatform(
         source,
         cleanUsername
       )
     )
-  );
-
-  const finalResults = await Promise.all(
-    directResults.map(async (result) => {
-      if (
-        result.statusType !== "BLOCKED" &&
-        result.statusType !== "UNKNOWN"
-      ) {
-        return result;
-      }
-
-      const fallback =
-        await runFallback(
-          result.platform,
-          cleanUsername
-        );
-
-      return fallback || result;
-    })
   );
 
   const statistics = {
@@ -219,9 +198,7 @@ async function scanUsername(username) {
 
   return {
     success: true,
-
     username: cleanUsername,
-
     profiles: finalResults,
 
     statistics: {
@@ -239,4 +216,3 @@ module.exports = {
   scanUsername,
   checkSinglePlatform,
 };
-
