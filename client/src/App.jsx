@@ -3,6 +3,12 @@ import axios from "axios";
 import heroImage from "./assets/hero-security.svg";
 import "./App.css";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:5000"
+    : "https://cybershield-zdsb.onrender.com");
+
 function App() {
 
   /* =================================================
@@ -116,7 +122,7 @@ function App() {
 
       const response =
         await axios.post(
-          "https://cybershield-zdsb.onrender.com/api/url-check",
+          `${API_BASE_URL}/api/url-check`,
           {
             url: url.trim()
           }
@@ -241,7 +247,7 @@ function App() {
 
       const response =
         await axios.post(
-          "https://cybershield-zdsb.onrender.com/api/file-check",
+          `${API_BASE_URL}/api/file-check`,
           formData
         );
 
@@ -350,7 +356,7 @@ function App() {
 
       const response =
         await axios.post(
-          "https://cybershield-zdsb.onrender.com/api/digital-footprint",
+          `${API_BASE_URL}/api/digital-footprint`,
           footprintData,
           { timeout: 30000 }
         );
@@ -406,7 +412,7 @@ function App() {
 
       const response =
         await axios.get(
-          "https://cybershield-zdsb.onrender.com/api/test"
+          `${API_BASE_URL}/api/test`
         );
 
       setBackendStatus(
