@@ -358,7 +358,7 @@ function App() {
         await axios.post(
           `${API_BASE_URL}/api/digital-footprint`,
           footprintData,
-          { timeout: 30000 }
+          { timeout: 120000 }
         );
 
 
