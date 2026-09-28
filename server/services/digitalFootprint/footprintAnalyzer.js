@@ -1,5 +1,6 @@
 const { scanUsername } = require("./usernameScanner");
 const analyzeEmail = require("./emailScanner");
+const { analyzeWithAI } = require("./aiAnalyzer");
 
 async function analyzeFootprint({
   username = "",
@@ -36,6 +37,7 @@ async function analyzeFootprint({
     riskScore: 0,
     riskLevel: "LOW",
     warnings: [],
+    aiAnalysis: null,
   };
 
   // -----------------------------
@@ -221,6 +223,21 @@ async function analyzeFootprint({
     result.riskLevel = "MEDIUM";
   } else {
     result.riskLevel = "LOW";
+  }
+
+  try {
+    result.aiAnalysis = await analyzeWithAI({
+      usernameResults: result.usernameResults,
+      usernameStatistics: result.usernameStatistics,
+      emailResult: result.emailResult,
+      riskScore: result.riskScore,
+      riskLevel: result.riskLevel,
+      warnings: result.warnings,
+    });
+  } catch (error) {
+    console.error("AI analyzer error:", error.message);
+
+    result.aiAnalysis = null;
   }
 
   return result;
